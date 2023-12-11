@@ -14,7 +14,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 
-public class ClashRoyale {
+public class ClashRoyaleCleaning {
     public static IntWritable getCount(Iterable<IntWritable> values){
         int count = 0;
         for (IntWritable i: values) {
@@ -22,7 +22,7 @@ public class ClashRoyale {
         }
         return new IntWritable(count);
     }
-    public static class ClashRoyaleMapper
+    public static class ClashRoyaleCleaningMapper
             extends Mapper<Text, CityWritable, IntWritable, IntWritable> {
         public static IntWritable count = new IntWritable(1);
 
@@ -32,7 +32,7 @@ public class ClashRoyale {
             context.write(new IntWritable(value.population), count);
         }
     }
-    public static class ClashRoyaleCombiner
+    public static class ClashRoyaleCleaningCombiner
             extends Reducer<IntWritable, IntWritable, IntWritable, IntWritable> {
 
         private static final ArrayList<IntWritable> intervals = new ArrayList<IntWritable>();
@@ -58,7 +58,7 @@ public class ClashRoyale {
             context.write(intervals.get(i), getCount(values));
         }
     }
-    public static class ClashRoyaleReducer
+    public static class ClashRoyaleCleaningReducer
             extends Reducer<IntWritable, IntWritable, IntWritable, IntWritable> {
         public void reduce(IntWritable key, Iterable<IntWritable> values,
                            Context context
@@ -147,16 +147,16 @@ public class ClashRoyale {
 
     public static void main(String[] args) throws Exception {
         Configuration conf = new Configuration();
-        Job job = Job.getInstance(conf, "ClashRoyale");
+        Job job = Job.getInstance(conf, "ClashRoyaleCleaning");
         job.setNumReduceTasks(1);
-        job.setJarByClass(ClashRoyale.class);
-        job.setMapperClass(ClashRoyaleMapper.class);
+        job.setJarByClass(ClashRoyaleCleaning.class);
+        job.setMapperClass(ClashRoyaleCleaningMapper.class);
         job.setMapOutputKeyClass(IntWritable.class);
         job.setMapOutputValueClass(IntWritable.class);
-        job.setCombinerClass(ClashRoyaleCombiner.class);
+        job.setCombinerClass(ClashRoyaleCleaningCombiner.class);
         job.setOutputKeyClass(IntWritable.class);
         job.setOutputValueClass(IntWritable.class);
-        job.setReducerClass(ClashRoyaleReducer.class);
+        job.setReducerClass(ClashRoyaleCleaningReducer.class);
         job.setOutputKeyClass(IntWritable.class);
         job.setOutputValueClass(IntWritable.class);
         job.setOutputFormatClass(TextOutputFormat.class);

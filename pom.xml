@@ -29,7 +29,7 @@
   			<configuration>
   				<archive>
   					<manifest>
-  						<mainClass>ClashRoyale</mainClass>
+  						<mainClass>ClashRoyaleCleaning</mainClass>
   					</manifest>
   				</archive>
   			</configuration>
