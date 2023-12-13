@@ -1029,7 +1029,8 @@ export const cr_cards: Card[] = [
       id: 26000093,
       maxLevel: 4,
       iconUrls: {
-        "medium": "./images/littleprince.avif"
+        medium:
+          "https://api-assets.clashroyale.com/cards/300/dY-gSseki6KBpkIG17safHH5YlB8SErFZO9OXbJxf9w.png"
       }
     }
   ];
