@@ -1,6 +1,6 @@
 # bigdata_clash_royale
 
-data dans LSD: user/auber/data_ple/clash_royale/gdc_battles.nljson
+data dans LSD: /user/auber/data_ple/clash_royale/gdc_battles.nljson
                                                 wc_battles
 
 Data cleaning:
@@ -66,7 +66,7 @@ Data cleaning:
 ### deck, deck2: <span style="color: #B200ED"> Double</span>
     Moyenne d'elixir dans le deck (à préciser)
 ### clan, clan2: <span style="color: #B200ED"> String</span>
-    Id du clan
+    Id du clan, il n'est pas forcément renseigné mettre 0 dans ce cas
 ### crown, crown2: <span style="color: #B200ED">Int</span>
     Nombre de couronnes restantes
 ### elixir, elixir2: <span style="color: #B200ED"> Double</span>
