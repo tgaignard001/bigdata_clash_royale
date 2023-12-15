@@ -30,6 +30,18 @@ public class PlayerInfoWritable implements Writable, Cloneable {
         return player;
     }
 
+    public String getCards() {
+        return cards;
+    }
+
+    public int getClanTr() {
+        return clanTr;
+    }
+
+    public double getDeck() {
+        return deck;
+    }
+
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeUTF(player);

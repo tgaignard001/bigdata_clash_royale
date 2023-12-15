@@ -13,9 +13,7 @@ public class GameWritable implements Writable, Cloneable {
     private PlayerInfoWritable player1 = new PlayerInfoWritable();
     private PlayerInfoWritable player2 = new PlayerInfoWritable();
 
-    GameWritable() {
-
-    }
+    GameWritable() {}
 
     GameWritable(Instant date, int round, int win, PlayerInfoWritable player1, PlayerInfoWritable player2) {
         this.date = date;
@@ -38,6 +36,10 @@ public class GameWritable implements Writable, Cloneable {
 
     public PlayerInfoWritable getPlayer2() {
         return player2;
+    }
+
+    public int getWin() {
+        return win;
     }
 
     @Override
