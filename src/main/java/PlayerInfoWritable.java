@@ -9,7 +9,7 @@ public class PlayerInfoWritable implements Writable, Cloneable {
     private double allDeck;
     private double deck;
     private String cards;
-    private int clanTr;
+    private long clanTr;
     private String clan;
 
     PlayerInfoWritable() {
@@ -17,7 +17,7 @@ public class PlayerInfoWritable implements Writable, Cloneable {
     }
 
 
-    PlayerInfoWritable(String player, double allDeck, double deck, String cards, int clanTr, String clan) {
+    PlayerInfoWritable(String player, double allDeck, double deck, String cards, long clanTr, String clan) {
         this.player = player;
         this.allDeck = allDeck;
         this.deck = deck;
@@ -34,7 +34,7 @@ public class PlayerInfoWritable implements Writable, Cloneable {
         return cards;
     }
 
-    public int getClanTr() {
+    public long getClanTr() {
         return clanTr;
     }
 
@@ -48,7 +48,7 @@ public class PlayerInfoWritable implements Writable, Cloneable {
         out.writeDouble(allDeck);
         out.writeDouble(deck);
         out.writeUTF(cards);
-        out.writeInt(clanTr);
+        out.writeLong(clanTr);
         out.writeUTF(clan);
     }
 
@@ -58,7 +58,7 @@ public class PlayerInfoWritable implements Writable, Cloneable {
         allDeck = in.readDouble();
         deck = in.readDouble();
         cards = in.readUTF();
-        clanTr = in.readInt();
+        clanTr = in.readLong();
         clan = in.readUTF();
     }
 

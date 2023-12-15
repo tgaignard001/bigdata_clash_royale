@@ -8,14 +8,14 @@ import java.time.Instant;
 public class GameWritable implements Writable, Cloneable {
     private String id;
     private Instant date;
-    private int round;
-    private int win;
+    private long round;
+    private long win;
     private PlayerInfoWritable player1 = new PlayerInfoWritable();
     private PlayerInfoWritable player2 = new PlayerInfoWritable();
 
     GameWritable() {}
 
-    GameWritable(Instant date, int round, int win, PlayerInfoWritable player1, PlayerInfoWritable player2) {
+    GameWritable(Instant date, long round, long win, PlayerInfoWritable player1, PlayerInfoWritable player2) {
         this.date = date;
         this.round = round;
         this.win = win;
@@ -38,7 +38,7 @@ public class GameWritable implements Writable, Cloneable {
         return player2;
     }
 
-    public int getWin() {
+    public long getWin() {
         return win;
     }
 
@@ -46,8 +46,8 @@ public class GameWritable implements Writable, Cloneable {
     public void write(DataOutput out) throws IOException {
         out.writeUTF(id);
         out.writeUTF(date.toString());
-        out.writeInt(round);
-        out.writeInt(win);
+        out.writeLong(round);
+        out.writeLong(win);
         player1.write(out);
         player2.write(out);
     }
@@ -56,8 +56,8 @@ public class GameWritable implements Writable, Cloneable {
     public void readFields(DataInput in) throws IOException {
         id = in.readUTF();
         date = Instant.parse(in.readUTF());
-        round = in.readInt();
-        win = in.readInt();
+        round = in.readLong();
+        win = in.readLong();
         player1.readFields(in);
         player2.readFields(in);
     }

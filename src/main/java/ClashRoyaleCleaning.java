@@ -25,8 +25,8 @@ public class ClashRoyaleCleaning {
             JSONObject game = null;
             try {
                 game = new JSONObject(value.toString());
-                int clanTr1 = game.has(InputFields.CLAN_TR1) ? game.getInt(InputFields.CLAN_TR1) : 0;
-                int clanTr2 = game.has(InputFields.CLAN_TR2) ? game.getInt(InputFields.CLAN_TR2) : 0;
+                long clanTr1 = game.has(InputFields.CLAN_TR1) ? game.getLong(InputFields.CLAN_TR1) : 0;
+                long clanTr2 = game.has(InputFields.CLAN_TR2) ? game.getLong(InputFields.CLAN_TR2) : 0;
                 if (InputFields.checkFields(game)) {
                     PlayerInfoWritable player1 = new PlayerInfoWritable(
                             game.getString(InputFields.PLAYER1),
@@ -48,8 +48,8 @@ public class ClashRoyaleCleaning {
 
                     GameWritable gameWritable = new GameWritable(
                             Instant.parse(game.getString(InputFields.DATE)),
-                            game.getInt(InputFields.ROUND),
-                            game.getInt(InputFields.WIN),
+                            game.getLong(InputFields.ROUND),
+                            game.getLong(InputFields.WIN),
                             player1,
                             player2
                     );
@@ -77,6 +77,7 @@ public class ClashRoyaleCleaning {
         job.setMapperClass(ClashRoyaleCleaningMapper.class);
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(GameWritable.class);
+        job.setCombinerClass(ClashRoyaleCleaningReducer.class);
         job.setReducerClass(ClashRoyaleCleaningReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(GameWritable.class);

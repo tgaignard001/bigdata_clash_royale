@@ -1,13 +1,16 @@
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,7 +19,7 @@ import java.util.Collections;
 public class ClashRoyaleSummary {
 
 
-    public static class ClashRoyaleCleaningMapper
+    public static class ClashRoyaleSummaryMapper
             extends Mapper<Text, GameWritable, Text, DeckSummaryWritable> {
 
         public String sortCards(String cards){
@@ -66,11 +69,17 @@ public class ClashRoyaleSummary {
         }
     }
 
-    public static class ClashRoyaleCleaningReducer
+
+
+    public static class ClashRoyaleSummaryReducer
             extends Reducer<Text, DeckSummaryWritable, Text, DeckSummaryWritable> {
         public void reduce(Text key, Iterable<DeckSummaryWritable> values, Context context)
                 throws IOException, InterruptedException {
-            context.write(key, values.iterator().next());
+            DeckSummaryWritable deckReduced= values.iterator().next();
+            while (values.iterator().hasNext()){
+                deckReduced.updateDeckSummary(values.iterator().next());
+            }
+            context.write(key, deckReduced);
         }
     }
 
@@ -79,14 +88,17 @@ public class ClashRoyaleSummary {
         Job job = Job.getInstance(conf, "ClashRoyaleSummary");
         job.setNumReduceTasks(1);
         job.setJarByClass(ClashRoyaleSummary.class);
-        job.setMapperClass(ClashRoyaleCleaningMapper.class);
+        job.setMapperClass(ClashRoyaleSummaryMapper.class);
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(DeckSummaryWritable.class);
-        job.setReducerClass(ClashRoyaleCleaningReducer.class);
+        job.setCombinerClass(ClashRoyaleSummaryReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(DeckSummaryWritable.class);
-        job.setOutputFormatClass(SequenceFileOutputFormat.class);
-        job.setInputFormatClass(TextInputFormat.class);
+        job.setReducerClass(ClashRoyaleSummaryReducer.class);
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(DeckSummaryWritable.class);
+        job.setOutputFormatClass(TextOutputFormat.class);
+        job.setInputFormatClass(SequenceFileInputFormat.class);
         FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
         System.exit(job.waitForCompletion(true) ? 0 : 1);

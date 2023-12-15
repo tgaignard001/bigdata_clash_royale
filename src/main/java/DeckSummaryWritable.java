@@ -5,12 +5,12 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 public class DeckSummaryWritable implements Writable, Cloneable {
-    private int victories;
-    private int uses;
-    private int uniquePlayers;
-    private int highestClanLevel;
+    private long victories;
+    private long uses;
+    private long uniquePlayers;
+    private long highestClanLevel;
     private double sumDiffForce;
-    private int nbDiffForce;
+    private long nbDiffForce;
     DeckSummaryWritable() {
         this.victories = 0;
         this.uses = 0;
@@ -32,7 +32,7 @@ public class DeckSummaryWritable implements Writable, Cloneable {
         this.uses++;
     }
 
-    public void setHighestClanLevel(int highestClanLevel) {
+    public void setHighestClanLevel(long highestClanLevel) {
         this.highestClanLevel = highestClanLevel;
     }
 
@@ -54,22 +54,22 @@ public class DeckSummaryWritable implements Writable, Cloneable {
 
     @Override
     public void write(DataOutput out) throws IOException {
-        out.writeInt(victories);
-        out.writeInt(uses);
-        out.writeInt(uniquePlayers);
-        out.writeInt(highestClanLevel);
+        out.writeLong(victories);
+        out.writeLong(uses);
+        out.writeLong(uniquePlayers);
+        out.writeLong(highestClanLevel);
         out.writeDouble(sumDiffForce);
-        out.writeInt(nbDiffForce);
+        out.writeLong(nbDiffForce);
     }
 
     @Override
     public void readFields(DataInput in) throws IOException {
-        victories = in.readInt();
-        uses = in.readInt();
-        uniquePlayers = in.readInt();
-        highestClanLevel = in.readInt();
+        victories = in.readLong();
+        uses = in.readLong();
+        uniquePlayers = in.readLong();
+        highestClanLevel = in.readLong();
         sumDiffForce = in.readDouble();
-        nbDiffForce = in.readInt();
+        nbDiffForce = in.readLong();
     }
 
     @Override
