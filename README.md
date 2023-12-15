@@ -4,7 +4,7 @@ data dans LSD: /user/auber/data_ple/clash_royale/gdc_battles.nljson
                                                 wc_battles
 
 Data cleaning:
-    Vérifier les données valides 
+    Vérifier les données valides
     Pattern éléments distinct (Pour une même date, plusieurs parties car bo3 enregistrées à la fin)
     (Joueur1 VS joueur2 et Joueur2 VS Joueur1)
 
@@ -64,7 +64,7 @@ Data cleaning:
 ### touch, touch2: <span style="color: #B200ED"> 0 | 1 </span>
     Vaut 1 si le joueur a touché son écran
 ### deck, deck2: <span style="color: #B200ED"> Double</span>
-    Moyenne d'elixir dans le deck (à préciser)
+    force du deck
 ### clan, clan2: <span style="color: #B200ED"> String</span>
     Id du clan, il n'est pas forcément renseigné mettre 0 dans ce cas
 ### crown, crown2: <span style="color: #B200ED">Int</span>
@@ -83,3 +83,13 @@ Data cleaning:
     ?
 ### clanTr, clanTr2: <span style="color: #B200ED"> Int</span>
     Niveau du clan
+
+## Conseils
+
+Pour visualiser les processus sur yarn:
+
+ `yarn -top`
+
+Pour arrêter un processus:
+
+`yarn kill [id]`
