@@ -7,7 +7,7 @@ export default defineNuxtConfig({
     },
   },
 
-  modules: ['@nuxtjs/tailwindcss'],
+  modules: ['@nuxt/ui'],
 
   ssr: false,
 
