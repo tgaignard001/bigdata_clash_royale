@@ -1,17 +1,18 @@
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashSet;
 
 public class ClashRoyaleUniquePlayer {
     // Idée: on fait un autre job pour calculer le nombre de joueurs unique et on fera ensuite un join
@@ -20,32 +21,38 @@ public class ClashRoyaleUniquePlayer {
     // on envoie tous les players du set vers le reducer
     // le reducer recrée le set en local et écrit la taille du set
 
-    public static class ClashRoyaleCleaningMapper
-            extends Mapper<Text, GameWritable, Text, DeckSummaryWritable> {
+    public static class ClashRoyaleUniquePlayerMapper
+            extends Mapper<Text, GameWritable, Text, PlayerInfoWritable> {
 
-        public String sortCards(String cards){
+        HashSet<PlayerInfoWritable> playerList = new HashSet<>();
+        @Override
+        protected void map(Text key, GameWritable value, Context context) {
+            PlayerInfoWritable player1 = value.getPlayer1();
+            PlayerInfoWritable player2 = value.getPlayer2();
 
-            ArrayList<String> cardList = new ArrayList<>();
-            for (int i = 0; i < cards.length() / 2; ++i) {
-                String card = cards.substring(i * 2, i * 2 + 2);
-                cardList.add(card);
-            }
-
-            Collections.sort(cardList);
-            return String.join("", cardList);
+            playerList.add(player1);
+            playerList.add(player2);
         }
 
         @Override
-        protected void map(Text key, GameWritable value, Context context) throws IOException, InterruptedException {
-
+        protected void cleanup(Mapper<Text, GameWritable, Text, PlayerInfoWritable>.Context context) throws IOException, InterruptedException {
+            super.cleanup(context);
+            for (PlayerInfoWritable player : playerList) {
+                context.write(new Text(InputFields.sortCards(player.getCards())), player);
+            }
         }
     }
 
-    public static class ClashRoyaleCleaningReducer
-            extends Reducer<Text, DeckSummaryWritable, Text, DeckSummaryWritable> {
-        public void reduce(Text key, Iterable<DeckSummaryWritable> values, Context context)
-                throws IOException, InterruptedException {
-            context.write(key, values.iterator().next());
+    public static class ClashRoyaleUniquePlayerReducer
+            extends Reducer<Text, PlayerInfoWritable, Text, LongWritable> {
+
+        HashSet<PlayerInfoWritable> playerList = new HashSet<>();
+        public void reduce(Text key, Iterable<PlayerInfoWritable> values, Context context) throws IOException, InterruptedException {
+
+            while (values.iterator().hasNext()){
+                playerList.add(values.iterator().next().clone());
+            }
+            context.write(key, new LongWritable(playerList.size()));
         }
     }
 
@@ -54,14 +61,14 @@ public class ClashRoyaleUniquePlayer {
         Job job = Job.getInstance(conf, "ClashRoyaleSummary");
         job.setNumReduceTasks(1);
         job.setJarByClass(ClashRoyaleUniquePlayer.class);
-        job.setMapperClass(ClashRoyaleCleaningMapper.class);
+        job.setMapperClass(ClashRoyaleUniquePlayerMapper.class);
         job.setMapOutputKeyClass(Text.class);
-        job.setMapOutputValueClass(DeckSummaryWritable.class);
-        job.setReducerClass(ClashRoyaleCleaningReducer.class);
+        job.setMapOutputValueClass(PlayerInfoWritable.class);
+        job.setReducerClass(ClashRoyaleUniquePlayerReducer.class);
         job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(DeckSummaryWritable.class);
-        job.setOutputFormatClass(SequenceFileOutputFormat.class);
-        job.setInputFormatClass(TextInputFormat.class);
+        job.setOutputValueClass(LongWritable.class);
+        job.setOutputFormatClass(TextOutputFormat.class);
+        job.setInputFormatClass(SequenceFileInputFormat.class);
         FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
         System.exit(job.waitForCompletion(true) ? 0 : 1);

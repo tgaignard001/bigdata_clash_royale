@@ -75,7 +75,7 @@ public class ClashRoyaleSummary {
             extends Reducer<Text, DeckSummaryWritable, Text, DeckSummaryWritable> {
         public void reduce(Text key, Iterable<DeckSummaryWritable> values, Context context)
                 throws IOException, InterruptedException {
-            DeckSummaryWritable deckReduced= values.iterator().next();
+            DeckSummaryWritable deckReduced = values.iterator().next().clone();
             while (values.iterator().hasNext()){
                 deckReduced.updateDeckSummary(values.iterator().next());
             }

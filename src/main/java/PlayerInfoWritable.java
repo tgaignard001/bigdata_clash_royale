@@ -87,4 +87,15 @@ public class PlayerInfoWritable implements Writable, Cloneable {
             throw new AssertionError();
         }
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof PlayerInfoWritable){
+            PlayerInfoWritable player2 = (PlayerInfoWritable) obj;
+            String cards1 = InputFields.sortCards(this.cards);
+            String cards2 = InputFields.sortCards(player2.getCards());
+            return this.player.compareTo(player2.getPlayer()) == 0  && cards1.compareTo(cards2) == 0;
+        }
+        return false;
+    }
 }

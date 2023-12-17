@@ -85,14 +85,19 @@ public class DeckSummaryWritable implements Writable, Cloneable {
     }
 
     @Override
-    protected Object clone() throws CloneNotSupportedException {
-        DeckSummaryWritable clone = (DeckSummaryWritable) super.clone();
-        clone.victories = this.victories;
-        clone.uses = this.uses;
-        clone.uniquePlayers = this.uniquePlayers;
-        clone.highestClanLevel = this.highestClanLevel;
-        clone.sumDiffForce = this.sumDiffForce;
-        clone.nbDiffForce = this.nbDiffForce;
-        return clone;
+    public DeckSummaryWritable clone() {
+        try {
+            DeckSummaryWritable clone = (DeckSummaryWritable) super.clone();
+            clone.victories = this.victories;
+            clone.uses = this.uses;
+            clone.uniquePlayers = this.uniquePlayers;
+            clone.highestClanLevel = this.highestClanLevel;
+            clone.sumDiffForce = this.sumDiffForce;
+            clone.nbDiffForce = this.nbDiffForce;
+            return clone;
+        }catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+
     }
 }

@@ -1,6 +1,6 @@
 # bigdata_clash_royale
 
-data dans LSD: /user/auber/data_ple/clash_royale/gdc_battles.nljson
+data dans LSD: /user/auber/data_ple/clashroyale/gdc_battles.nljson
                                                 wc_battles
 
 Data cleaning:

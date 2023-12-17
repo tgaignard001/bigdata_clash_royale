@@ -1,6 +1,9 @@
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 public class InputFields {
     public static final String PLAYER1 = "player";
     public static final String ALL_DECK1 = "all_deck";
@@ -48,5 +51,16 @@ public class InputFields {
         } else {
             throw new IllegalArgumentException("Deck not valid");
         }
+    }
+
+    public static String sortCards(String cards){
+        ArrayList<String> cardList = new ArrayList<>();
+        for (int i = 0; i < cards.length() / 2; ++i) {
+            String card = cards.substring(i * 2, i * 2 + 2);
+            cardList.add(card);
+        }
+
+        Collections.sort(cardList);
+        return String.join("", cardList);
     }
 }
