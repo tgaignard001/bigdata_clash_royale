@@ -16,35 +16,6 @@ import java.util.*;
 
 public class ClashRoyaleTopK {
 
-    private static void maintainTreeMapSize(TreeMap<Double, String> treeMap, int k){
-        while(treeMap.size() > k){
-            treeMap.remove(treeMap.firstKey());
-        }
-    }
-
-    private static void sendSummaryFromTreeMaps(TaskInputOutputContext<?,?, NullWritable, SummaryTopK> context, TreeMap<Double, String> winRateTopK, TreeMap<Double, String> meanDiffForceTopK) throws IOException, InterruptedException {
-        DeckTopK winRate = new DeckTopK();
-        DeckTopK meanDiffForce = new DeckTopK();
-        SummaryTopK output = new SummaryTopK();
-
-        Iterator<Map.Entry<Double, String>> winRateIterator = winRateTopK.entrySet().iterator();
-        Iterator<Map.Entry<Double, String>> meanDiffForceIterator = meanDiffForceTopK.entrySet().iterator();
-
-        while (winRateIterator.hasNext() && meanDiffForceIterator.hasNext()){
-            Map.Entry<Double, String> winRateEntry = winRateIterator.next();
-            Map.Entry<Double, String> meanDiffForceEntry = meanDiffForceIterator.next();
-
-            winRate.setId(winRateEntry.getValue());
-            winRate.setValue(winRateEntry.getKey());
-
-            meanDiffForce.setId(meanDiffForceEntry.getValue());
-            meanDiffForce.setValue(meanDiffForceEntry.getKey());
-
-            output.setValues(winRate.clone(), meanDiffForce.clone());
-            context.write(NullWritable.get(), output);
-        }
-    }
-
     public static class ClashRoyaleTopKMapper
             extends Mapper<Text, DeckSummaryWritable, NullWritable, SummaryTopK> {
 
@@ -87,18 +58,16 @@ public class ClashRoyaleTopK {
         protected void map(Text key, DeckSummaryWritable value, Context context) throws IOException, InterruptedException {
             addWinRate(key.toString(), value);
             addMeanDiffForce(key.toString(), value);
-            maintainTreeMapSize(winRateTopK, k);
-            maintainTreeMapSize(meanDiffForceTopK, k);
+            TreeMapManager.maintainTreeMapSize(winRateTopK, k);
+            TreeMapManager.maintainTreeMapSize(meanDiffForceTopK, k);
         }
 
         @Override
         protected void cleanup(Mapper<Text, DeckSummaryWritable, NullWritable, SummaryTopK>.Context context)
                 throws IOException, InterruptedException {
-            sendSummaryFromTreeMaps(context, winRateTopK, meanDiffForceTopK);
+            TreeMapManager.sendSummaryFromTreeMaps(context, winRateTopK, meanDiffForceTopK);
         }
     }
-
-
 
     public static class ClashRoyaleTopKReducer
             extends Reducer<NullWritable, SummaryTopK, NullWritable, SummaryTopK> {
@@ -118,11 +87,11 @@ public class ClashRoyaleTopK {
             for (SummaryTopK value : values){
                 winRateTopK.put(value.getWinRate().getValue(), value.getWinRate().getId());
                 meanDiffForceTopK.put(value.getMeanDiffForce().getValue(), value.getMeanDiffForce().getId());
-                maintainTreeMapSize(winRateTopK, k);
-                maintainTreeMapSize(meanDiffForceTopK, k);
+                TreeMapManager.maintainTreeMapSize(winRateTopK, k);
+                TreeMapManager.maintainTreeMapSize(meanDiffForceTopK, k);
             }
 
-            sendSummaryFromTreeMaps(context, winRateTopK, meanDiffForceTopK);
+            TreeMapManager.sendSummaryFromTreeMaps(context, winRateTopK, meanDiffForceTopK);
         }
     }
 

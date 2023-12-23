@@ -41,7 +41,7 @@ public class SummaryTopK implements Writable, Cloneable {
     @Override
     public String toString() {
         return "winRate: " + winRate
-                + "meanDiffForce: " + meanDiffForce;
+                + ", meanDiffForce: " + meanDiffForce;
     }
 
     @Override
