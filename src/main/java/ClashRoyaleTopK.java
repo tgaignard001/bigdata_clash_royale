@@ -1,5 +1,6 @@
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -12,71 +13,89 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class ClashRoyaleTopK {
-
-
     public static class ClashRoyaleTopKMapper
-            extends Mapper<Text, GameWritable, Text, DeckSummaryWritable> {
+            extends Mapper<Text, DeckSummaryWritable, NullWritable, SummaryTopK> {
 
-        public String sortCards(String cards){
+        private final TreeMap<Double, String> winRateTopK = new TreeMap<Double, String>();
+        private int k = 10;
 
-            ArrayList<String> cardList = new ArrayList<>();
-            for (int i = 0; i < cards.length() / 2; ++i) {
-                String card = cards.substring(i * 2, i * 2 + 2);
-                cardList.add(card);
+        /**
+         * Add in winRateTopk tree the winRate if the value is interesting
+         * @param deck
+         */
+        private void addWinRate(String id, DeckSummaryWritable deck){
+            double victories = deck.getVictories();
+            double uses = deck.getUses();
+            if (uses > 100) {
+                double winRate = victories/uses;
+                winRateTopK.put(winRate, id);
             }
-
-            Collections.sort(cardList);
-            return String.join("", cardList);
         }
 
         @Override
-        protected void map(Text key, GameWritable value, Context context) throws IOException, InterruptedException {
+        protected void setup(Mapper<Text, DeckSummaryWritable, NullWritable, SummaryTopK>.Context context)
+                throws IOException, InterruptedException {
+            this.k = context.getConfiguration().getInt("k", 10);
+        }
 
-            PlayerInfoWritable player1 = value.getPlayer1();
-            PlayerInfoWritable player2 = value.getPlayer2();
-
-            String newKey1 = sortCards(player1.getCards());
-            String newKey2 = sortCards(player2.getCards());
-            DeckSummaryWritable deckSummary1 = new DeckSummaryWritable();
-            DeckSummaryWritable deckSummary2 = new DeckSummaryWritable();
-
-            if (value.getWin() == 1){
-                deckSummary1.incVictories();
-            }else {
-                deckSummary2.incVictories();
+        @Override
+        protected void map(Text key, DeckSummaryWritable value, Context context) throws IOException, InterruptedException {
+            addWinRate(key.toString(), value);
+            while(winRateTopK.size() > k){
+                winRateTopK.remove(winRateTopK.firstKey());
             }
+        }
 
-            deckSummary1.incUses();
-            deckSummary2.incUses();
+        @Override
+        protected void cleanup(Mapper<Text, DeckSummaryWritable, NullWritable, SummaryTopK>.Context context)
+                throws IOException, InterruptedException {
+            DeckTopK winRate = new DeckTopK();
+            SummaryTopK output = new SummaryTopK();
 
-            deckSummary1.setHighestClanLevel(player1.getClanTr());
-            deckSummary2.setHighestClanLevel(player2.getClanTr());
-
-            double diffForce = player1.getDeck() - player2.getDeck();
-            deckSummary1.addDiffForce(diffForce);
-            deckSummary2.addDiffForce(-diffForce);
-
-            deckSummary1.incNbDiffForce();
-            deckSummary2.incNbDiffForce();
-
-            context.write(new Text(newKey1), deckSummary1);
-            context.write(new Text(newKey2), deckSummary2);
+            for(Map.Entry<Double, String> pair : winRateTopK.entrySet()) {
+                winRate.setId(pair.getValue());
+                winRate.setValue(pair.getKey());
+                output.setWinRate(winRate.clone());
+                context.write(NullWritable.get(), output);
+            }
         }
     }
 
 
 
     public static class ClashRoyaleTopKReducer
-            extends Reducer<Text, DeckSummaryWritable, Text, DeckSummaryWritable> {
-        public void reduce(Text key, Iterable<DeckSummaryWritable> values, Context context)
+            extends Reducer<NullWritable, SummaryTopK, NullWritable, SummaryTopK> {
+        private int k = 10;
+
+        @Override
+        protected void setup(Reducer<NullWritable, SummaryTopK, NullWritable, SummaryTopK>.Context context)
                 throws IOException, InterruptedException {
-            DeckSummaryWritable deckReduced = values.iterator().next().clone();
-            while (values.iterator().hasNext()){
-                deckReduced.updateDeckSummary(values.iterator().next());
+            this.k = context.getConfiguration().getInt("k", 10);
+        }
+
+        public void reduce(Text key, Iterable<SummaryTopK> values, Context context)
+                throws IOException, InterruptedException {
+            TreeMap<Double, String> winRateTopK = new TreeMap<Double, String>();
+            for (SummaryTopK value : values){
+                winRateTopK.put(value.getWinRate().getValue(), value.getWinRate().getId());
+                while(winRateTopK.size() > k) {
+                    winRateTopK.remove(winRateTopK.firstKey());
+                }
             }
-            context.write(key, deckReduced);
+
+            DeckTopK winRate = new DeckTopK();
+            SummaryTopK output = new SummaryTopK();
+
+            for(Map.Entry<Double, String> pair : winRateTopK.entrySet()) {
+                winRate.setId(pair.getValue());
+                winRate.setValue(pair.getKey());
+                output.setWinRate(winRate.clone());
+                context.write(NullWritable.get(), output);
+            }
         }
     }
 
@@ -86,14 +105,11 @@ public class ClashRoyaleTopK {
         job.setNumReduceTasks(1);
         job.setJarByClass(ClashRoyaleTopK.class);
         job.setMapperClass(ClashRoyaleTopKMapper.class);
-        job.setMapOutputKeyClass(Text.class);
-        job.setMapOutputValueClass(DeckSummaryWritable.class);
-        job.setCombinerClass(ClashRoyaleTopKReducer.class);
-        job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(DeckSummaryWritable.class);
+        job.setMapOutputKeyClass(NullWritable.class);
+        job.setMapOutputValueClass(SummaryTopK.class);
         job.setReducerClass(ClashRoyaleTopKReducer.class);
-        job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(DeckSummaryWritable.class);
+        job.setOutputKeyClass(NullWritable.class);
+        job.setOutputValueClass(SummaryTopK.class);
         job.setOutputFormatClass(TextOutputFormat.class);
         job.setInputFormatClass(SequenceFileInputFormat.class);
         FileInputFormat.addInputPath(job, new Path(args[0]));

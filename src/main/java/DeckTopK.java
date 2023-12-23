@@ -11,8 +11,21 @@ public class DeckTopK implements Writable, Cloneable {
     DeckTopK() {
     }
 
+    public String getId() {
+        return id;
+    }
 
+    public double getValue() {
+        return value;
+    }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setValue(double value) {
+        this.value = value;
+    }
 
     @Override
     public void write(DataOutput out) throws IOException {

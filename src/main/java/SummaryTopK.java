@@ -7,6 +7,14 @@ import java.io.IOException;
 public class SummaryTopK implements Writable, Cloneable {
     private DeckTopK winRate = new DeckTopK();
 
+    public DeckTopK getWinRate() {
+        return winRate;
+    }
+
+    public void setWinRate(DeckTopK winRate) {
+        this.winRate = winRate;
+    }
+
     @Override
     public void write(DataOutput out) throws IOException{
         winRate.write(out);
