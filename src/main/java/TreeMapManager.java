@@ -7,32 +7,28 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class TreeMapManager {
-    public static void maintainTreeMapSize(TreeMap<Double, String> treeMap, int k){
+    public static void maintainTreeMapSize(TreeMap<Double, DeckSummaryWritable> treeMap, int k){
         while(treeMap.size() > k){
             treeMap.remove(treeMap.firstKey());
         }
     }
 
-    public static void sendSummaryFromTreeMaps(TaskInputOutputContext<?,?, NullWritable, SummaryTopK> context, TreeMap<Double, String> winRateTopK, TreeMap<Double, String> meanDiffForceTopK) throws IOException, InterruptedException {
-        DeckTopK winRate = new DeckTopK();
-        DeckTopK meanDiffForce = new DeckTopK();
-        SummaryTopK output = new SummaryTopK();
+    public static void sendSummaryFromTreeMaps(TaskInputOutputContext<?,?, NullWritable, DeckSummaryWritable> context, TreeMap<Double, DeckSummaryWritable> treeMap) throws IOException, InterruptedException {for(Map.Entry<Double, DeckSummaryWritable> pair : treeMap.entrySet()) {
+            context.write(NullWritable.get(), pair.getValue().clone());
+        }
+    }
 
-        Iterator<Map.Entry<Double, String>> winRateIterator = winRateTopK.entrySet().iterator();
-        Iterator<Map.Entry<Double, String>> meanDiffForceIterator = meanDiffForceTopK.entrySet().iterator();
-
-        while (winRateIterator.hasNext() && meanDiffForceIterator.hasNext()){
-            Map.Entry<Double, String> winRateEntry = winRateIterator.next();
-            Map.Entry<Double, String> meanDiffForceEntry = meanDiffForceIterator.next();
-
-            winRate.setId(winRateEntry.getValue());
-            winRate.setValue(winRateEntry.getKey());
-
-            meanDiffForce.setId(meanDiffForceEntry.getValue());
-            meanDiffForce.setValue(meanDiffForceEntry.getKey());
-
-            output.setValues(winRate.clone(), meanDiffForce.clone());
-            context.write(NullWritable.get(), output);
+    /**
+     * Add in winRateTopk tree the winRate if the value is interesting
+     * @param treeMap TreeMap with value of winRate sorted
+     * @param deck DeckSummary with information of the deck
+     */
+    public static void addWinRate(TreeMap<Double, DeckSummaryWritable> treeMap, DeckSummaryWritable deck){
+        double victories = deck.getVictories();
+        double uses = deck.getUses();
+        if (uses > 100) {
+            double winRate = victories/uses;
+            treeMap.put(winRate, deck.clone());
         }
     }
 }
