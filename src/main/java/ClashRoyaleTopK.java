@@ -1,4 +1,3 @@
-import com.sun.source.tree.Tree;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
@@ -6,7 +5,6 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.mapreduce.TaskInputOutputContext;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
@@ -20,20 +18,12 @@ public class ClashRoyaleTopK {
     public static class ClashRoyaleTopKMapper
             extends Mapper<Text, DeckSummaryWritable, NullWritable, DeckSummaryWritable> {
 
-        private final TreeMap<Double, DeckSummaryWritable> treeMap = new TreeMap<Double, DeckSummaryWritable>();
-
-        private int k = 10;
+        private final TreeMap<Double, DeckSummaryWritable> treeMap = new TreeMap<>();
 
         @Override
-        protected void setup(Mapper<Text, DeckSummaryWritable, NullWritable, DeckSummaryWritable>.Context context)
-                throws IOException, InterruptedException {
-            this.k = context.getConfiguration().getInt("k", 10);
-        }
-
-        @Override
-        protected void map(Text key, DeckSummaryWritable value, Context context) throws IOException, InterruptedException {
+        protected void map(Text key, DeckSummaryWritable value, Context context) {
             TreeMapManager.addWinRate(treeMap, value);
-            TreeMapManager.maintainTreeMapSize(treeMap, k);
+            TreeMapManager.maintainTreeMapSize(treeMap);
         }
 
         @Override
@@ -45,21 +35,15 @@ public class ClashRoyaleTopK {
 
     public static class ClashRoyaleTopKReducer
             extends Reducer<NullWritable, DeckSummaryWritable, NullWritable, DeckSummaryWritable> {
-        private int k = 10;
 
         @Override
-        protected void setup(Reducer<NullWritable, DeckSummaryWritable, NullWritable, DeckSummaryWritable>.Context context)
+        public void reduce(NullWritable key, Iterable<DeckSummaryWritable> values, Context context)
                 throws IOException, InterruptedException {
-            this.k = context.getConfiguration().getInt("k", 10);
-        }
-
-        public void reduce(Text key, Iterable<DeckSummaryWritable> values, Context context)
-                throws IOException, InterruptedException {
-            TreeMap<Double, DeckSummaryWritable> treeMap = new TreeMap<Double, DeckSummaryWritable>();
+            TreeMap<Double, DeckSummaryWritable> treeMap = new TreeMap<>();
 
             for (DeckSummaryWritable value : values){
                 TreeMapManager.addWinRate(treeMap, value);
-                TreeMapManager.maintainTreeMapSize(treeMap, k);
+                TreeMapManager.maintainTreeMapSize(treeMap);
             }
             TreeMapManager.sendSummaryFromTreeMaps(context, treeMap);
         }

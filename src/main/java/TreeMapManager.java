@@ -2,13 +2,14 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.TaskInputOutputContext;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
 public class TreeMapManager {
-    public static void maintainTreeMapSize(TreeMap<Double, DeckSummaryWritable> treeMap, int k){
-        while(treeMap.size() > k){
+    public static final int KVALUE = 500;
+
+    public static void maintainTreeMapSize(TreeMap<Double, DeckSummaryWritable> treeMap){
+        while(treeMap.size() > KVALUE){
             treeMap.remove(treeMap.firstKey());
         }
     }
