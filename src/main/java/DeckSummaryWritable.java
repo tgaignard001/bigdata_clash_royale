@@ -36,6 +36,10 @@ public class DeckSummaryWritable implements Writable, Cloneable {
         this.highestClanLevel = highestClanLevel;
     }
 
+    public void setUniquePlayers(long uniquePlayers) {
+        this.uniquePlayers = uniquePlayers;
+    }
+
     public void addDiffForce(double diffForce){
         this.sumDiffForce += diffForce;
     }
@@ -48,6 +52,7 @@ public class DeckSummaryWritable implements Writable, Cloneable {
         this.victories += deckSummary.victories;
         this.uses += deckSummary.uses;
         this.highestClanLevel = Math.max(deckSummary.highestClanLevel, this.highestClanLevel);
+        this.uniquePlayers = Math.max(deckSummary.uniquePlayers, this.uniquePlayers);
         this.sumDiffForce += deckSummary.sumDiffForce;
         this.nbDiffForce += deckSummary.nbDiffForce;
     }
