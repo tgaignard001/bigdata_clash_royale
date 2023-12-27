@@ -25,19 +25,19 @@ const data = [{
     games: props.deckSummary.uses,
     unique_players: props.deckSummary.uniquePlayers,
     highest_clan: props.deckSummary.highestClanLevel,
-    mean_winning_force: props.deckSummary.sumDiffForce/props.deckSummary.nbDiffForce
+    mean_winning_force: (props.deckSummary.sumDiffForce/props.deckSummary.nbDiffForce).toFixed(2)
 }]
 
 </script>
 <template>
-    <div class="flex flex-row gap-2 border-4 border-black p-4 m-4 bg-white">
+    <div class="flex flex-row gap-2 border-4 border-black p-4 m-4 bg-white items-center">
         <div class="flex flex-row content-center items-center">
             <div v-for="card in deck.cards()" class="flex flex-col items-center">
                 {{ card[0] }}
-                <img :src="card[1]" onerror="this.src='/card-champion-unknown.png'"/>
+                <NuxtImg :src="card[1]" placeholder="/card-champion-unknown.png"/>
             </div>
         </div>
-        <UTable :rows="data" :columns="columns" class="w-3/5 text-center"/>
+        <UTable :rows="data" :columns="columns" class="text-center"/>
     </div>
 
 </template>

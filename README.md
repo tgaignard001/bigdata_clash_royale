@@ -58,7 +58,7 @@ Data cleaning:
 ### player, player2: <span style="color: #B200ED"> String</span>
     Nom des joueurs(pas en clair)
 ### level, level2: <span style="color: #B200ED"> Int</span>
-    Niveau du joueur
+    Nombre de trophées du joueur
 ### all_deck, all_deck2: <span style="color: #B200ED"> Double</span>
     Valeur du deck en elixir (à préciser)
 ### touch, touch2: <span style="color: #B200ED"> 0 | 1 </span>
@@ -76,9 +76,9 @@ Data cleaning:
 ### cards et cards2: <span style="color: #B200ED"> String</span>
     code hexadécimal 2 caractères pour avoir le numéro de la carte
 ### exp, exp2: <span style="color: #B200ED"> Int</span>
-    XP gagné pour la partie (à vérifier)
+    Niveau du joueur
 ### expPoints, expPoints2: <span style="color: #B200ED"> Int</span>
-    Niveau d'expérience accumulé par les joueurs (à vérifier)
+    Niveau d'expérience accumulé par les joueurs depuis le début de leur compte
 ### cardScore, cardScore2: <span style="color: #B200ED"> Int</span>
     ?
 ### clanTr, clanTr2: <span style="color: #B200ED"> Int</span>

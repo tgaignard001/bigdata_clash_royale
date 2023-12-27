@@ -1,38 +1,14 @@
 import { readFileSync } from "fs";
 import type { DeckSummary } from "~/models/deckSummary";
-import { MAXDECKLISTSIZE } from "~/models/deckSummary";
-
 
 const filePath = "utils/summary_small.txt"
 
-export default defineEventHandler((event) => {
-    const index = getRouterParam(event, 'index');
-    console.log("new fetch with " + index);
-    return {
-        content: getDecks((index) ? parseInt(index) : 0),
-        size: getNbPages()
-    }
-})
-
-function getAllLines(){
+export function getAllLines(){
     return readFileSync(filePath, 'utf-8').split("\n").map(extractDeckSummary).filter((summary) => summary !== null) as DeckSummary[]
 }
 
-function getNbPages(){
-    console.log("nb lines:" + getAllLines().length);
-
-    return getAllLines().length/MAXDECKLISTSIZE;
-}
-
-function getDecks(pageIndex: number) {
-    const selectedLines = getAllLines();
-    return selectedLines.slice(pageIndex*MAXDECKLISTSIZE, pageIndex*MAXDECKLISTSIZE + MAXDECKLISTSIZE);
-}
-
-
-
 // Fonction pour extraire les données d'une ligne
-function extractDeckSummary(line: string): DeckSummary | null {
+export function extractDeckSummary(line: string): DeckSummary | null {
     const match = line.match(/(\w+)\s*DeckSummary{victories=(\d+), uses=(\d+), uniquePlayers=(\d+), highestClanLevel=(\d+), sumDiffForce=([\d.]+), nbDiffForce=(\d+)}/);
 
     if (match) {

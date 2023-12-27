@@ -7,18 +7,15 @@ for (let i =0; i< items.value.length; i++){
     items.value[i] = {id: i, value: i*2}
 }
 
-
 let deck_list: DeckSummary[][] = []
 
 const { data } = await useFetch('/api/getDecks');
 deck_list = (data.value?.content) ? data.value?.content : [];
-console.log(deck_list);
-
 
 </script>
 
 <template>
-    <div class="flex flex-col items-center">
+    <div class="flex flex-col items-center h-[81vh]">
         <DecksList :deck_list="deck_list[page]"/>
         <UPagination v-model="page" :page-count="MAXDECKLISTSIZE" :total="deck_list.length" size="xl"/>
     </div>

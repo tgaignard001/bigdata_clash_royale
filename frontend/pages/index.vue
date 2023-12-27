@@ -17,20 +17,18 @@ const items = [{
         <div class="p-4 h-1/5">
             BIGROYALEDATA
         </div>
-        <div class="w-full h-4/5">
-            <UTabs :items="items" class="w-full h-full" >
-                <template #item="{ item }">
-                    <div v-if="item.key === 'home'" class="space-y-3">
-                        <Home />
-                    </div>
-                    <div v-if="item.key === 'decks'" class="space-y-3">
-                        <Decks />
-                    </div>
-                    <div v-if="item.key === 'ngrams'" class="space-y-3">
-                        <Ngram />
-                    </div>
-                </template>
-            </UTabs>
-        </div>
+        <UTabs :items="items" class="w-full" >
+            <template #item="{ item }">
+                <div v-if="item.key === 'home'" class="flex space-y-3">
+                    <Home />
+                </div>
+                <div v-if="item.key === 'decks'" class="space-y-3">
+                    <Decks />
+                </div>
+                <div v-if="item.key === 'ngrams'" class="space-y-3">
+                    <Ngram />
+                </div>
+            </template>
+        </UTabs>
     </div>
 </template>
