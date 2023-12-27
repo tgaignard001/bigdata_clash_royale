@@ -32,6 +32,10 @@ public class DeckSummaryWritable implements Writable, Cloneable {
         return uses;
     }
 
+    public long getUniquePlayers() {
+        return uniquePlayers;
+    }
+
     public void incVictories() {
         this.victories++;
     }

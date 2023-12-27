@@ -25,9 +25,12 @@ public class TreeMapManager {
      * @param deck DeckSummary with information of the deck
      */
     public static void addWinRate(TreeMap<Double, DeckSummaryWritable> treeMap, DeckSummaryWritable deck){
+        final long MIN_USES = 100;
+        final long MIN_UNIQUE_PLAYERS = 10;
         double victories = deck.getVictories();
         double uses = deck.getUses();
-        if (uses > 100) {
+        long uniquePlayers = deck.getUniquePlayers();
+        if (uses > MIN_USES && uniquePlayers > MIN_UNIQUE_PLAYERS) {
             double winRate = victories/uses;
             treeMap.put(winRate, deck.clone());
         }
