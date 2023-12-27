@@ -24,6 +24,14 @@ public class DeckSummaryWritable implements Writable, Cloneable {
         return this.sumDiffForce/this.nbDiffForce;
     }
 
+    public double getVictories() {
+        return victories;
+    }
+
+    public long getUses() {
+        return uses;
+    }
+
     public void incVictories() {
         this.victories++;
     }
