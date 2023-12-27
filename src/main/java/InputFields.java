@@ -1,8 +1,7 @@
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 
 public class InputFields {
     public static final String PLAYER1 = "player";

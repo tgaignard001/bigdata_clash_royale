@@ -22,7 +22,7 @@ public class ClashRoyaleCleaning {
 
         @Override
         protected void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-            JSONObject game = null;
+            JSONObject game;
             try {
                 game = new JSONObject(value.toString());
                 long clanTr1 = game.has(InputFields.CLAN_TR1) ? game.getLong(InputFields.CLAN_TR1) : 0;
@@ -65,7 +65,7 @@ public class ClashRoyaleCleaning {
             extends Reducer<Text, GameWritable, Text, GameWritable> {
         public void reduce(Text key, Iterable<GameWritable> values, Context context)
                 throws IOException, InterruptedException {
-            context.write(key, values.iterator().next());
+            context.write(key, values.iterator().next().clone());
         }
     }
 

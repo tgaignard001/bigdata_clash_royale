@@ -88,8 +88,12 @@ Data cleaning:
 
 Pour visualiser les processus sur yarn:
 
- `yarn -top`
+ `yarn application -list`
 
 Pour arrêter un processus:
 
-`yarn kill [id]`
+`yarn application -kill [id]`
+
+Pour compter le nombre de lignes d'un fichier:
+
+`hdfs dfs -cat [file_path] | wc -l`

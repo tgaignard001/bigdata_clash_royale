@@ -12,9 +12,7 @@ public class PlayerInfoWritable implements Writable, Cloneable {
     private long clanTr;
     private String clan;
 
-    PlayerInfoWritable() {
-
-    }
+    PlayerInfoWritable() {}
 
 
     PlayerInfoWritable(String player, double allDeck, double deck, String cards, long clanTr, String clan) {
@@ -94,7 +92,7 @@ public class PlayerInfoWritable implements Writable, Cloneable {
             PlayerInfoWritable player2 = (PlayerInfoWritable) obj;
             String cards1 = InputFields.sortCards(this.cards);
             String cards2 = InputFields.sortCards(player2.getCards());
-            return this.player.compareTo(player2.getPlayer()) == 0  && cards1.compareTo(cards2) == 0;
+            return (this.player.equals(player2.getPlayer()) && cards1.equals(cards2));
         }
         return false;
     }
