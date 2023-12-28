@@ -8,7 +8,7 @@ const props = defineProps<{deck_list: DeckSummary[]}>();
 <template>
     <div :key="deck_list.toString()" class="flex flex-col gap-4 m-4 h-full overflow-auto">
         <div v-for="deck in deck_list" class="flex flex-row items-center">
-            <DecksDeck :key="deck.strDeck" :deck-summary="deck"/>
+            <DecksDeck :key="deck.cards" :deck-summary="deck"/>
         </div>
     </div>
 </template>

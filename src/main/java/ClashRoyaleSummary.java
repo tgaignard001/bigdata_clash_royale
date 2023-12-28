@@ -21,13 +21,13 @@ public class ClashRoyaleSummary {
         @Override
         protected void map(Text key, GameWritable value, Context context) throws IOException, InterruptedException {
 
-            PlayerInfoWritable player1 = value.getPlayer1();
-            PlayerInfoWritable player2 = value.getPlayer2();
+            PlayerInfoWritable player1 = value.getPlayer1().clone();
+            PlayerInfoWritable player2 = value.getPlayer2().clone();
 
             String newKey1 = InputFields.sortCards(player1.getCards());
             String newKey2 = InputFields.sortCards(player2.getCards());
-            DeckSummaryWritable deckSummary1 = new DeckSummaryWritable();
-            DeckSummaryWritable deckSummary2 = new DeckSummaryWritable();
+            DeckSummaryWritable deckSummary1 = new DeckSummaryWritable(player1.getCards());
+            DeckSummaryWritable deckSummary2 = new DeckSummaryWritable(player2.getCards());
 
             if (value.getWin() == 1){
                 deckSummary1.incVictories();
@@ -57,7 +57,7 @@ public class ClashRoyaleSummary {
             extends Mapper<Text, LongWritable, Text, DeckSummaryWritable>{
         @Override
         protected void map(Text key, LongWritable value, Context context) throws IOException, InterruptedException {
-            DeckSummaryWritable deckSummary = new DeckSummaryWritable();
+            DeckSummaryWritable deckSummary = new DeckSummaryWritable(key.toString());
             deckSummary.setUniquePlayers(value.get());
             context.write(key, deckSummary);
         }

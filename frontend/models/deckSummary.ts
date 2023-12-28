@@ -1,7 +1,7 @@
 export const MAXDECKLISTSIZE = 20;
 
 export type DeckSummary = {
-    strDeck: string;
+    cards: string;
     victories: number;
     uses: number;
     uniquePlayers: number;
@@ -11,7 +11,7 @@ export type DeckSummary = {
 }
 
 export const EMPTY_DECK_SUMMARY: DeckSummary = {
-    strDeck: "0000000000000000",
+    cards: "0000000000000000",
     victories: -1,
     uses: -1,
     uniquePlayers: -1,

@@ -5,13 +5,18 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 public class DeckSummaryWritable implements Writable, Cloneable {
+    private String sortedCards;
     private long victories;
     private long uses;
     private long uniquePlayers;
     private long highestClanLevel;
     private double sumDiffForce;
     private long nbDiffForce;
-    DeckSummaryWritable() {
+
+    DeckSummaryWritable(){}
+
+    DeckSummaryWritable(String cards) {
+        this.sortedCards = InputFields.sortCards(cards);
         this.victories = 0;
         this.uses = 0;
         this.uniquePlayers = 0;
@@ -71,6 +76,7 @@ public class DeckSummaryWritable implements Writable, Cloneable {
 
     @Override
     public void write(DataOutput out) throws IOException {
+        out.writeUTF(sortedCards);
         out.writeLong(victories);
         out.writeLong(uses);
         out.writeLong(uniquePlayers);
@@ -81,6 +87,7 @@ public class DeckSummaryWritable implements Writable, Cloneable {
 
     @Override
     public void readFields(DataInput in) throws IOException {
+        sortedCards = in.readUTF();
         victories = in.readLong();
         uses = in.readLong();
         uniquePlayers = in.readLong();
@@ -91,13 +98,14 @@ public class DeckSummaryWritable implements Writable, Cloneable {
 
     @Override
     public String toString() {
-        return "DeckSummary{" +
-                "victories=" + victories +
-                ", uses=" + uses +
-                ", uniquePlayers=" + uniquePlayers +
-                ", highestClanLevel=" + highestClanLevel +
-                ", sumDiffForce=" + sumDiffForce +
-                ", nbDiffForce=" + nbDiffForce +
+        return "{" +
+                "\"cards\": \"" + sortedCards + "\"" +
+                ", \"victories\": " + victories +
+                ", \"uses\": " + uses +
+                ", \"uniquePlayers\": " + uniquePlayers +
+                ", \"highestClanLevel\": " + highestClanLevel +
+                ", \"sumDiffForce\": " + sumDiffForce +
+                ", \"nbDiffForce\": " + nbDiffForce +
                 '}';
     }
 
@@ -105,6 +113,7 @@ public class DeckSummaryWritable implements Writable, Cloneable {
     public DeckSummaryWritable clone() {
         try {
             DeckSummaryWritable clone = (DeckSummaryWritable) super.clone();
+            clone.sortedCards = this.sortedCards;
             clone.victories = this.victories;
             clone.uses = this.uses;
             clone.uniquePlayers = this.uniquePlayers;
