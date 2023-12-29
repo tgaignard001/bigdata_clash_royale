@@ -10,9 +10,9 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+
 import java.io.IOException;
 import java.time.Instant;
-
 
 
 public class ClashRoyaleCleaning {
