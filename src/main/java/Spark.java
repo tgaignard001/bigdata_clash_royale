@@ -38,6 +38,16 @@ public class Spark {
         for(Tuple2<String, Game> x : gamesRDD.collect()) {
             System.out.println(x._2.toString());
         }
+
+        // Third part : cleaning
+        JavaRDD<Tuple2<String, DeckSummaryWritable>> deckSummary = gamesRDD.map(
+                (game) -> {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    JsonNode gameJson = objectMapper.readTree(jsonLine);
+                    return null;
+                }
+        )
+
     }
 
 }

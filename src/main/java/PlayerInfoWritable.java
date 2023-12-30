@@ -3,18 +3,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-
-public class PlayerInfoWritable implements Writable, Cloneable {
-    private String player;
-    private double allDeck;
-    private double deck;
-    private String cards;
-    private long clanTr;
-    private String clan;
-
-PlayerInfoWritable() {
-    }
-
 public class PlayerInfoWritable extends PlayerInfo implements Writable {
 
     PlayerInfoWritable() {
