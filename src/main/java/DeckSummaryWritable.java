@@ -6,6 +6,9 @@ import java.io.IOException;
 
 public class DeckSummaryWritable implements Writable, Cloneable {
     private String sortedCards;
+    private long year;
+    private long month;
+    private int dateType;
     private long victories;
     private long uses;
     private long uniquePlayers;
@@ -13,10 +16,14 @@ public class DeckSummaryWritable implements Writable, Cloneable {
     private double sumDiffForce;
     private long nbDiffForce;
 
-    DeckSummaryWritable(){}
+    DeckSummaryWritable() {
+    }
 
-    DeckSummaryWritable(String cards) {
+    DeckSummaryWritable(String cards, long year, long month, SummaryDateType dateType) {
         this.sortedCards = InputFields.sortCards(cards);
+        this.year = year;
+        this.month = month;
+        this.dateType = dateType.ordinal();
         this.victories = 0;
         this.uses = 0;
         this.uniquePlayers = 0;
@@ -25,8 +32,24 @@ public class DeckSummaryWritable implements Writable, Cloneable {
         this.nbDiffForce = 0;
     }
 
-    public double getMeanDiffForce(){
-        return this.sumDiffForce/this.nbDiffForce;
+    public String getSortedCards() {
+        return sortedCards;
+    }
+
+    public SummaryDateType getDateType() {
+        return SummaryDateType.getDateType(dateType);
+    }
+
+    public long getYear() {
+        return year;
+    }
+
+    public long getMonth() {
+        return month;
+    }
+
+    public double getMeanDiffForce() {
+        return this.sumDiffForce / this.nbDiffForce;
     }
 
     public double getVictories() {
@@ -57,26 +80,31 @@ public class DeckSummaryWritable implements Writable, Cloneable {
         this.uniquePlayers = uniquePlayers;
     }
 
-    public void addDiffForce(double diffForce){
+    public void addDiffForce(double diffForce) {
         this.sumDiffForce += diffForce;
     }
 
-    public void incNbDiffForce(){
+    public void incNbDiffForce() {
         this.nbDiffForce++;
     }
 
-    public void updateDeckSummary(DeckSummaryWritable deckSummary){
+    public void updateDeckSummary(DeckSummaryWritable deckSummary) {
         this.victories += deckSummary.victories;
         this.uses += deckSummary.uses;
         this.highestClanLevel = Math.max(deckSummary.highestClanLevel, this.highestClanLevel);
         this.uniquePlayers = Math.max(deckSummary.uniquePlayers, this.uniquePlayers);
         this.sumDiffForce += deckSummary.sumDiffForce;
         this.nbDiffForce += deckSummary.nbDiffForce;
+        this.year = (this.year == 0) ? deckSummary.year : this.year;
+        this.month = (this.month == 0) ? deckSummary.month : this.month;
     }
 
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeUTF(sortedCards);
+        out.writeLong(year);
+        out.writeLong(month);
+        out.writeInt(dateType);
         out.writeLong(victories);
         out.writeLong(uses);
         out.writeLong(uniquePlayers);
@@ -88,6 +116,9 @@ public class DeckSummaryWritable implements Writable, Cloneable {
     @Override
     public void readFields(DataInput in) throws IOException {
         sortedCards = in.readUTF();
+        year = in.readLong();
+        month = in.readLong();
+        dateType = in.readInt();
         victories = in.readLong();
         uses = in.readLong();
         uniquePlayers = in.readLong();
@@ -100,6 +131,9 @@ public class DeckSummaryWritable implements Writable, Cloneable {
     public String toString() {
         return "{" +
                 "\"cards\": \"" + sortedCards + "\"" +
+                ", \"year\": " + year +
+                ", \"month\": " + month +
+                ", \"dateType\": \"" + SummaryDateType.getDateType(dateType) + "\"" +
                 ", \"victories\": " + victories +
                 ", \"uses\": " + uses +
                 ", \"uniquePlayers\": " + uniquePlayers +
@@ -114,6 +148,9 @@ public class DeckSummaryWritable implements Writable, Cloneable {
         try {
             DeckSummaryWritable clone = (DeckSummaryWritable) super.clone();
             clone.sortedCards = this.sortedCards;
+            clone.year = this.year;
+            clone.month = this.month;
+            clone.dateType = this.dateType;
             clone.victories = this.victories;
             clone.uses = this.uses;
             clone.uniquePlayers = this.uniquePlayers;
@@ -121,7 +158,7 @@ public class DeckSummaryWritable implements Writable, Cloneable {
             clone.sumDiffForce = this.sumDiffForce;
             clone.nbDiffForce = this.nbDiffForce;
             return clone;
-        }catch (CloneNotSupportedException e) {
+        } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }
 

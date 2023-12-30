@@ -38,21 +38,21 @@ public class InputFields {
                 && checkCardsInput(game.getString(InputFields.CARDS2));
     }
 
-    private static boolean checkCardsInput(String cards){
+    private static boolean checkCardsInput(String cards) {
         return cards.length() == 16 || (cards.length() == 18 && cards.startsWith("6E", 16));
     }
 
-    public static String getCardsChecked(String cards){
-        if (cards.length() == 16){
+    public static String getCardsChecked(String cards) {
+        if (cards.length() == 16) {
             return cards;
-        } else if (cards.length() == 18 && cards.startsWith("6E", 16)){
+        } else if (cards.length() == 18 && cards.startsWith("6E", 16)) {
             return cards.substring(0, 17);
         } else {
             throw new IllegalArgumentException("Deck not valid");
         }
     }
 
-    public static String sortCards(String cards){
+    public static String sortCards(String cards) {
         ArrayList<String> cardList = new ArrayList<>();
         for (int i = 0; i < cards.length() / 2; ++i) {
             String card = cards.substring(i * 2, i * 2 + 2);

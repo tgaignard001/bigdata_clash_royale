@@ -13,7 +13,8 @@ public class GameWritable implements Writable, Cloneable {
     private PlayerInfoWritable player1 = new PlayerInfoWritable();
     private PlayerInfoWritable player2 = new PlayerInfoWritable();
 
-    GameWritable() {}
+    GameWritable() {
+    }
 
     GameWritable(Instant date, long round, long win, PlayerInfoWritable player1, PlayerInfoWritable player2) {
         this.date = date;
@@ -21,9 +22,9 @@ public class GameWritable implements Writable, Cloneable {
         this.win = win;
         this.player1 = player1;
         this.player2 = player2;
-        String prefix = date.toString()+"-"+round;
+        String prefix = date.toString() + "-" + round;
         String suffix = player1.getPlayer().compareTo(player2.getPlayer()) < 0 ? player1.getPlayer() + player2.getPlayer() : player2.getPlayer() + player1.getPlayer();
-        this.id = prefix +"-"+ suffix;
+        this.id = prefix + "-" + suffix;
     }
 
     public String getId() {
@@ -40,6 +41,10 @@ public class GameWritable implements Writable, Cloneable {
 
     public long getWin() {
         return win;
+    }
+
+    public Instant getDate() {
+        return date;
     }
 
     @Override

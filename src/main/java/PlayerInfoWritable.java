@@ -12,7 +12,8 @@ public class PlayerInfoWritable implements Writable, Cloneable {
     private long clanTr;
     private String clan;
 
-    PlayerInfoWritable() {}
+    PlayerInfoWritable() {
+    }
 
 
     PlayerInfoWritable(String player, double allDeck, double deck, String cards, long clanTr, String clan) {
@@ -88,7 +89,7 @@ public class PlayerInfoWritable implements Writable, Cloneable {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof PlayerInfoWritable){
+        if (obj instanceof PlayerInfoWritable) {
             PlayerInfoWritable player2 = (PlayerInfoWritable) obj;
             String cards1 = InputFields.sortCards(this.cards);
             String cards2 = InputFields.sortCards(player2.getCards());

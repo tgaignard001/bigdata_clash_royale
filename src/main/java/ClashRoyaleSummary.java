@@ -21,43 +21,24 @@ public class ClashRoyaleSummary {
         @Override
         protected void map(Text key, GameWritable value, Context context) throws IOException, InterruptedException {
 
-            PlayerInfoWritable player1 = value.getPlayer1().clone();
-            PlayerInfoWritable player2 = value.getPlayer2().clone();
+            SummaryCreator summaryCreator = new SummaryCreator(value.getPlayer1(), value.getPlayer2(), value.getDate(), value.getWin());
 
-            String newKey1 = InputFields.sortCards(player1.getCards());
-            String newKey2 = InputFields.sortCards(player2.getCards());
-            DeckSummaryWritable deckSummary1 = new DeckSummaryWritable(player1.getCards());
-            DeckSummaryWritable deckSummary2 = new DeckSummaryWritable(player2.getCards());
-
-            if (value.getWin() == 1){
-                deckSummary1.incVictories();
-            }else {
-                deckSummary2.incVictories();
+            for (DeckSummaryWritable deckSummary : summaryCreator.generateSummaries()) {
+                String deckSummaryKey = SummaryCreator.generateKey(deckSummary.getSortedCards(), deckSummary.getDateType(), deckSummary.getYear(), deckSummary.getMonth());
+                context.write(new Text(deckSummaryKey), deckSummary);
             }
-
-            deckSummary1.incUses();
-            deckSummary2.incUses();
-
-            deckSummary1.setHighestClanLevel(player1.getClanTr());
-            deckSummary2.setHighestClanLevel(player2.getClanTr());
-
-            double diffForce = player1.getDeck() - player2.getDeck();
-            deckSummary1.addDiffForce(diffForce);
-            deckSummary2.addDiffForce(-diffForce);
-
-            deckSummary1.incNbDiffForce();
-            deckSummary2.incNbDiffForce();
-
-            context.write(new Text(newKey1), deckSummary1);
-            context.write(new Text(newKey2), deckSummary2);
         }
     }
 
     public static class ClashRoyaleUniqueMapper
-            extends Mapper<Text, LongWritable, Text, DeckSummaryWritable>{
+            extends Mapper<Text, LongWritable, Text, DeckSummaryWritable> {
         @Override
         protected void map(Text key, LongWritable value, Context context) throws IOException, InterruptedException {
-            DeckSummaryWritable deckSummary = new DeckSummaryWritable(key.toString());
+            String cards = SummaryCreator.extractCardsFromKey(key.toString());
+            long year = SummaryCreator.extractYearFromKey(key.toString());
+            long month = SummaryCreator.extractMonthFromKey(key.toString());
+            SummaryDateType dateType = SummaryCreator.extractDateTypeFromKey(key.toString());
+            DeckSummaryWritable deckSummary = new DeckSummaryWritable(cards, year, month, dateType);
             deckSummary.setUniquePlayers(value.get());
             context.write(key, deckSummary);
         }
@@ -68,8 +49,8 @@ public class ClashRoyaleSummary {
         public void reduce(Text key, Iterable<DeckSummaryWritable> values, Context context)
                 throws IOException, InterruptedException {
             DeckSummaryWritable deckReduced = values.iterator().next().clone();
-            while (values.iterator().hasNext()){
-                deckReduced.updateDeckSummary(values.iterator().next());
+            while (values.iterator().hasNext()) {
+                deckReduced.updateDeckSummary(values.iterator().next().clone());
             }
             context.write(key, deckReduced);
         }
