@@ -11,7 +11,6 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 
 import java.io.IOException;
 
@@ -22,15 +21,11 @@ public class ClashRoyaleCleaning {
 
         @Override
         protected void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-            try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode gameJson = objectMapper.readTree(value.toString());
-                if (InputFields.checkFields(gameJson)) {
-                    GameWritable gameWritable = new GameWritable(InputFields.createGame(gameJson));
-                    context.write(new Text(gameWritable.getId()), gameWritable);
-                }
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode gameJson = objectMapper.readTree(value.toString());
+            if (InputFields.checkFields(gameJson)) {
+                GameWritable gameWritable = new GameWritable(InputFields.createGame(gameJson));
+                context.write(new Text(gameWritable.getId()), gameWritable);
             }
         }
     }

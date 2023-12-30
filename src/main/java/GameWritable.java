@@ -3,7 +3,6 @@ import org.apache.hadoop.io.Writable;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.io.Serializable;
 import java.time.Instant;
 
 public class GameWritable extends Game implements Writable {
