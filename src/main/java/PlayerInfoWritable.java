@@ -9,9 +9,10 @@ import java.util.UUID;
 
 public class PlayerInfoWritable extends PlayerInfo implements Writable {
 
-    PlayerInfoWritable(){
+    PlayerInfoWritable() {
         super();
     }
+
     PlayerInfoWritable(String player, double allDeck, double deck, String cards, long clanTr, String clan) {
         super(player, allDeck, deck, cards, clanTr, clan);
     }
@@ -19,6 +20,7 @@ public class PlayerInfoWritable extends PlayerInfo implements Writable {
     PlayerInfoWritable(PlayerInfo playerInfo) {
         super(playerInfo.getPlayer(), playerInfo.getAllDeck(), playerInfo.getDeck(), playerInfo.getCards(), playerInfo.getClanTr(), playerInfo.getClan());
     }
+
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeUTF(player);
@@ -41,6 +43,14 @@ public class PlayerInfoWritable extends PlayerInfo implements Writable {
 
     @Override
     public PlayerInfoWritable clone() {
-        return (PlayerInfoWritable) super.clone();
+        PlayerInfoWritable clone = (PlayerInfoWritable) super.clone();
+        clone.player = this.player;
+        clone.allDeck = this.allDeck;
+        clone.deck = this.deck;
+        clone.cards = this.cards;
+        clone.clanTr = this.clanTr;
+        clone.clan = this.clan;
+        return clone;
     }
+
 }
