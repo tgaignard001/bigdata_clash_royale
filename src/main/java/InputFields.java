@@ -1,6 +1,6 @@
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
 
+import java.time.Instant;
 import java.util.*;
 
 public class InputFields {
@@ -22,9 +22,9 @@ public class InputFields {
     public static final String ROUND = "round";
     public static final String WIN = "win";
 
-    public static boolean checkFields(JSONObject game) throws JSONException {
-        int touch1 = game.has(InputFields.TOUCH1) ? game.getInt(InputFields.TOUCH1) : 0;
-        int touch2 = game.has(InputFields.TOUCH2) ? game.getInt(InputFields.TOUCH2) : 0;
+    public static boolean checkFields(JsonNode game) {
+        int touch1 = game.has(InputFields.TOUCH1) ? game.get(InputFields.TOUCH1).asInt() : 0;
+        int touch2 = game.has(InputFields.TOUCH2) ? game.get(InputFields.TOUCH2).asInt() : 0;
         return touch1 == 1 && touch2 == 1
                 && game.has(InputFields.PLAYER1) && game.has(InputFields.PLAYER1)
                 && game.has(InputFields.ALL_DECK1) && game.has(InputFields.ALL_DECK2)
@@ -34,8 +34,8 @@ public class InputFields {
                 && game.has(InputFields.DATE)
                 && game.has(InputFields.ROUND)
                 && game.has(InputFields.WIN)
-                && checkCardsInput(game.getString(InputFields.CARDS1))
-                && checkCardsInput(game.getString(InputFields.CARDS2));
+                && checkCardsInput(game.get(InputFields.CARDS1).asText())
+                && checkCardsInput(game.get(InputFields.CARDS2).asText());
     }
 
     private static boolean checkCardsInput(String cards) {
@@ -61,5 +61,35 @@ public class InputFields {
 
         Collections.sort(cardList);
         return String.join("", cardList);
+    }
+
+    private static PlayerInfo createPlayer(JsonNode game, String playerKey, String allDeckKey, String deckKey, String cardsKey, String clanTrKey, String clanKey) {
+        long clanTr = game.has(clanTrKey) ? game.get(clanTrKey).asLong() : 0;
+        return new PlayerInfo(
+                game.get(playerKey).asText(),
+                game.get(allDeckKey).asDouble(),
+                game.get(deckKey).asDouble(),
+                InputFields.getCardsChecked(game.get(cardsKey).asText()),
+                clanTr,
+                game.get(clanKey).asText()
+        );
+    }
+
+    private static PlayerInfo createPlayer1(JsonNode game) {
+        return createPlayer(game, InputFields.PLAYER1, InputFields.ALL_DECK1, InputFields.DECK1, InputFields.CARDS1, InputFields.CLAN_TR1, InputFields.CLAN1);
+    }
+
+    private static PlayerInfo createPlayer2(JsonNode game) {
+        return createPlayer(game, InputFields.PLAYER2, InputFields.ALL_DECK2, InputFields.DECK2, InputFields.CARDS2, InputFields.CLAN_TR2, InputFields.CLAN2);
+    }
+
+    public static Game createGame(JsonNode game) {
+        return new Game(
+                Instant.parse(game.get(InputFields.DATE).asText()),
+                game.get(InputFields.ROUND).asLong(),
+                game.get(InputFields.WIN).asLong(),
+                createPlayer1(game),
+                createPlayer2(game)
+        );
     }
 }

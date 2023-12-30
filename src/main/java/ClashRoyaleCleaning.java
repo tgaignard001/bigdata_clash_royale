@@ -1,3 +1,5 @@
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.*;
@@ -8,11 +10,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
-
 import java.io.IOException;
-import java.time.Instant;
 
 
 public class ClashRoyaleCleaning {
@@ -22,41 +20,11 @@ public class ClashRoyaleCleaning {
 
         @Override
         protected void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-            JSONObject game;
-            try {
-                game = new JSONObject(value.toString());
-                long clanTr1 = game.has(InputFields.CLAN_TR1) ? game.getLong(InputFields.CLAN_TR1) : 0;
-                long clanTr2 = game.has(InputFields.CLAN_TR2) ? game.getLong(InputFields.CLAN_TR2) : 0;
-                if (InputFields.checkFields(game)) {
-                    PlayerInfoWritable player1 = new PlayerInfoWritable(
-                            game.getString(InputFields.PLAYER1),
-                            game.getDouble(InputFields.ALL_DECK1),
-                            game.getDouble(InputFields.DECK1),
-                            InputFields.getCardsChecked(game.getString(InputFields.CARDS1)),
-                            clanTr1,
-                            game.getString(InputFields.CLAN1)
-                    );
-
-                    PlayerInfoWritable player2 = new PlayerInfoWritable(
-                            game.getString(InputFields.PLAYER2),
-                            game.getDouble(InputFields.ALL_DECK2),
-                            game.getDouble(InputFields.DECK2),
-                            InputFields.getCardsChecked(game.getString(InputFields.CARDS2)),
-                            clanTr2,
-                            game.getString(InputFields.CLAN2)
-                    );
-
-                    GameWritable gameWritable = new GameWritable(
-                            Instant.parse(game.getString(InputFields.DATE)),
-                            game.getLong(InputFields.ROUND),
-                            game.getLong(InputFields.WIN),
-                            player1,
-                            player2
-                    );
-                    context.write(new Text(gameWritable.getId()), gameWritable);
-                }
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode gameJson = objectMapper.readTree(value.toString());
+            if (InputFields.checkFields(gameJson)) {
+                GameWritable gameWritable = new GameWritable(InputFields.createGame(gameJson));
+                context.write(new Text(gameWritable.getId()), gameWritable);
             }
         }
     }
