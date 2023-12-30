@@ -22,7 +22,7 @@ public class ClashRoyaleTopK {
 
         @Override
         protected void map(Text key, DeckSummaryWritable value, Context context) {
-            TreeMapManager.addWinRate(treeMap, value);
+            TreeMapManager.deckAdder.addDeck(treeMap, value);
             TreeMapManager.maintainTreeMapSize(treeMap);
         }
 
@@ -41,8 +41,8 @@ public class ClashRoyaleTopK {
                 throws IOException, InterruptedException {
             TreeMap<Double, DeckSummaryWritable> treeMap = new TreeMap<>();
 
-            for (DeckSummaryWritable value : values){
-                TreeMapManager.addWinRate(treeMap, value);
+            for (DeckSummaryWritable value : values) {
+                TreeMapManager.deckAdder.addDeck(treeMap, value);
                 TreeMapManager.maintainTreeMapSize(treeMap);
             }
             TreeMapManager.sendSummaryFromTreeMaps(context, treeMap);

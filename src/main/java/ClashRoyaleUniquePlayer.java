@@ -15,38 +15,33 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ClashRoyaleUniquePlayer {
-    // Idée: on fait un autre job pour calculer le nombre de joueurs unique et on fera ensuite un join
-    // On envoie <deckId, player>
-    // dans chaque mapper, on crée un set local de tous les players reçus
-    // on envoie tous les players du set vers le reducer
-    // le reducer recrée le set en local et écrit la taille du set
-
     public static class ClashRoyaleUniquePlayerMapper
-            extends Mapper<Text, GameWritable, Text, PlayerInfoWritable> {
+            extends Mapper<Text, GameWritable, Text, UniquePlayerWritable> {
 
-        private final Set<PlayerInfoWritable> playerList = new HashSet<>();
+        private final Set<UniquePlayerWritable> playerList = new HashSet<>();
+
         @Override
         protected void map(Text key, GameWritable value, Context context) {
-            PlayerInfoWritable player1 = value.getPlayer1();
-            PlayerInfoWritable player2 = value.getPlayer2();
-            playerList.add(player1.clone());
-            playerList.add(player2.clone());
+            SummaryCreator summaryCreator = new SummaryCreator(value.getPlayer1(), value.getPlayer2(), value.getDate(), value.getWin());
+
+            playerList.addAll(summaryCreator.generateUniquePlayers());
         }
 
         @Override
-        protected void cleanup(Mapper<Text, GameWritable, Text, PlayerInfoWritable>.Context context) throws IOException, InterruptedException {
-            for (PlayerInfoWritable player : playerList) {
-                context.write(new Text(InputFields.sortCards(player.getCards())), player);
+        protected void cleanup(Mapper<Text, GameWritable, Text, UniquePlayerWritable>.Context context) throws IOException, InterruptedException {
+            for (UniquePlayerWritable uniquePlayer : playerList) {
+                String uniquePlayerKey = SummaryCreator.generateKey(uniquePlayer.getCards(), uniquePlayer.getDateType(), uniquePlayer.getYear(), uniquePlayer.getMonth());
+                context.write(new Text(uniquePlayerKey), uniquePlayer);
             }
         }
     }
 
     public static class ClashRoyaleUniquePlayerReducer
-            extends Reducer<Text, PlayerInfoWritable, Text, LongWritable> {
+            extends Reducer<Text, UniquePlayerWritable, Text, LongWritable> {
 
 
-        public void reduce(Text key, Iterable<PlayerInfoWritable> values, Context context) throws IOException, InterruptedException {
-            HashSet<PlayerInfoWritable> playerList = new HashSet<>();
+        public void reduce(Text key, Iterable<UniquePlayerWritable> values, Context context) throws IOException, InterruptedException {
+            HashSet<UniquePlayerWritable> playerList = new HashSet<>();
             while (values.iterator().hasNext()) {
                 playerList.add(values.iterator().next().clone());
             }
@@ -62,7 +57,7 @@ public class ClashRoyaleUniquePlayer {
         job.setMapperClass(ClashRoyaleUniquePlayerMapper.class);
 
         job.setMapOutputKeyClass(Text.class);
-        job.setMapOutputValueClass(PlayerInfoWritable.class);
+        job.setMapOutputValueClass(UniquePlayerWritable.class);
 
         job.setReducerClass(ClashRoyaleUniquePlayerReducer.class);
 

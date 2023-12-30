@@ -4,6 +4,17 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 
+public class PlayerInfoWritable implements Writable, Cloneable {
+    private String player;
+    private double allDeck;
+    private double deck;
+    private String cards;
+    private long clanTr;
+    private String clan;
+
+PlayerInfoWritable() {
+    }
+
 public class PlayerInfoWritable extends PlayerInfo implements Writable {
 
     PlayerInfoWritable() {
@@ -48,6 +59,18 @@ public class PlayerInfoWritable extends PlayerInfo implements Writable {
         clone.clanTr = this.clanTr;
         clone.clan = this.clan;
         return clone;
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof PlayerInfoWritable) {
+            PlayerInfoWritable player2 = (PlayerInfoWritable) obj;
+            String cards1 = InputFields.sortCards(this.cards);
+            String cards2 = InputFields.sortCards(player2.getCards());
+            return (this.player.equals(player2.getPlayer()) && cards1.equals(cards2));
+        }
+        return false;
     }
 
 }
