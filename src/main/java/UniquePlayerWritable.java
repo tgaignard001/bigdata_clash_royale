@@ -4,14 +4,10 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public class UniquePlayerWritable implements Writable, Cloneable {
-    private String playerName;
-    private String cards;
-    private long year;
-    private long month;
-    private int dateType;
+public class UniquePlayerWritable extends UniquePlayer implements Writable {
 
     public UniquePlayerWritable() {
+        super();
     }
 
     public UniquePlayerWritable(String playerName, String cards, long year, long month, SummaryDateType dateType) {
@@ -22,20 +18,8 @@ public class UniquePlayerWritable implements Writable, Cloneable {
         this.dateType = dateType.ordinal();
     }
 
-    public String getCards() {
-        return cards;
-    }
-
-    public long getYear() {
-        return year;
-    }
-
-    public long getMonth() {
-        return month;
-    }
-
-    public SummaryDateType getDateType() {
-        return SummaryDateType.getDateType(dateType);
+    public UniquePlayerWritable(UniquePlayer uniquePlayer){
+        super(uniquePlayer.playerName, uniquePlayer.cards, uniquePlayer.getYear(), uniquePlayer.getMonth(), uniquePlayer.getDateType());
     }
 
     @Override
@@ -57,29 +41,14 @@ public class UniquePlayerWritable implements Writable, Cloneable {
     }
 
     @Override
-    public String toString() {
-        return "UniquePlayerWritable{" +
-                "playerName='" + playerName + '\'' +
-                ", cards='" + cards + '\'' +
-                ", year=" + year +
-                ", month=" + month +
-                ", dateType=" + dateType +
-                '}';
-    }
-
-    @Override
     public UniquePlayerWritable clone() {
-        try {
-            UniquePlayerWritable clone = (UniquePlayerWritable) super.clone();
-            clone.playerName = this.playerName;
-            clone.cards = this.cards;
-            clone.year = this.year;
-            clone.month = this.month;
-            clone.dateType = this.dateType;
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
+        UniquePlayerWritable clone = (UniquePlayerWritable) super.clone();
+        clone.playerName = this.playerName;
+        clone.cards = this.cards;
+        clone.year = this.year;
+        clone.month = this.month;
+        clone.dateType = this.dateType;
+        return clone;
     }
 
     @Override

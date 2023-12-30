@@ -23,9 +23,12 @@ public class ClashRoyaleSummary {
 
             SummaryCreator summaryCreator = new SummaryCreator(value.getPlayer1(), value.getPlayer2(), value.getDate(), value.getWin());
 
-            for (DeckSummaryWritable deckSummary : summaryCreator.generateSummaries()) {
-                String deckSummaryKey = SummaryCreator.generateKey(deckSummary.getSortedCards(), deckSummary.getDateType(), deckSummary.getYear(), deckSummary.getMonth());
-                context.write(new Text(deckSummaryKey), deckSummary);
+            DeckSummaryWritable deckSummaryWritable;
+
+            for (DeckSummary deckSummary : summaryCreator.generateSummaries()) {
+                deckSummaryWritable = new DeckSummaryWritable(deckSummary);
+                String deckSummaryKey = SummaryCreator.generateKey(deckSummaryWritable.getSortedCards(), deckSummaryWritable.getDateType(), deckSummaryWritable.getYear(), deckSummaryWritable.getMonth());
+                context.write(new Text(deckSummaryKey), deckSummaryWritable);
             }
         }
     }

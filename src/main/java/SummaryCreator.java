@@ -11,10 +11,10 @@ public class SummaryCreator {
     private final long year;
     private final Month month;
     private final long win;
-    private final PlayerInfoWritable player1;
-    private final PlayerInfoWritable player2;
+    private final PlayerInfo player1;
+    private final PlayerInfo player2;
 
-    public SummaryCreator(PlayerInfoWritable player1, PlayerInfoWritable player2, Instant date, long win) {
+    public SummaryCreator(PlayerInfo player1, PlayerInfo player2, Instant date, long win) {
         this.player1 = player1.clone();
         this.player2 = player2.clone();
         this.diffForce = player1.getDeck() - player2.getDeck();
@@ -24,11 +24,11 @@ public class SummaryCreator {
         this.win = win;
     }
 
-    public ArrayList<DeckSummaryWritable> generateSummaries() {
-        ArrayList<DeckSummaryWritable> summaryList = new ArrayList<>();
+    public ArrayList<DeckSummary> generateSummaries() {
+        ArrayList<DeckSummary> summaryList = new ArrayList<>();
         for (SummaryDateType dateType : SummaryDateType.values()) {
-            DeckSummaryWritable deckSummary1 = new DeckSummaryWritable(player1.getCards(), year, month.getValue(), dateType);
-            DeckSummaryWritable deckSummary2 = new DeckSummaryWritable(player2.getCards(), year, month.getValue(), dateType);
+            DeckSummary deckSummary1 = new DeckSummary(player1.getCards(), year, month.getValue(), dateType);
+            DeckSummary deckSummary2 = new DeckSummary(player2.getCards(), year, month.getValue(), dateType);
 
             if (win == 1) {
                 deckSummary1.incVictories();
@@ -54,11 +54,11 @@ public class SummaryCreator {
         return summaryList;
     }
 
-    public ArrayList<UniquePlayerWritable> generateUniquePlayers() {
-        ArrayList<UniquePlayerWritable> uniquePlayerList = new ArrayList<>();
+    public ArrayList<UniquePlayer> generateUniquePlayers() {
+        ArrayList<UniquePlayer> uniquePlayerList = new ArrayList<>();
         for (SummaryDateType dateType : SummaryDateType.values()) {
-            UniquePlayerWritable uniquePlayer1 = new UniquePlayerWritable(player1.getPlayer(), player1.getCards(), year, month.getValue(), dateType);
-            UniquePlayerWritable uniquePlayer2 = new UniquePlayerWritable(player2.getPlayer(), player2.getCards(), year, month.getValue(), dateType);
+            UniquePlayer uniquePlayer1 = new UniquePlayer(player1.getPlayer(), player1.getCards(), year, month.getValue(), dateType);
+            UniquePlayer uniquePlayer2 = new UniquePlayer(player2.getPlayer(), player2.getCards(), year, month.getValue(), dateType);
 
             uniquePlayerList.add(uniquePlayer1);
             uniquePlayerList.add(uniquePlayer2);
