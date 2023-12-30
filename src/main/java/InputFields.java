@@ -1,6 +1,7 @@
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
+import java.time.Instant;
 import java.util.*;
 
 public class InputFields {
@@ -38,21 +39,21 @@ public class InputFields {
                 && checkCardsInput(game.getString(InputFields.CARDS2));
     }
 
-    private static boolean checkCardsInput(String cards){
+    private static boolean checkCardsInput(String cards) {
         return cards.length() == 16 || (cards.length() == 18 && cards.startsWith("6E", 16));
     }
 
-    public static String getCardsChecked(String cards){
-        if (cards.length() == 16){
+    public static String getCardsChecked(String cards) {
+        if (cards.length() == 16) {
             return cards;
-        } else if (cards.length() == 18 && cards.startsWith("6E", 16)){
+        } else if (cards.length() == 18 && cards.startsWith("6E", 16)) {
             return cards.substring(0, 17);
         } else {
             throw new IllegalArgumentException("Deck not valid");
         }
     }
 
-    public static String sortCards(String cards){
+    public static String sortCards(String cards) {
         ArrayList<String> cardList = new ArrayList<>();
         for (int i = 0; i < cards.length() / 2; ++i) {
             String card = cards.substring(i * 2, i * 2 + 2);
@@ -61,5 +62,35 @@ public class InputFields {
 
         Collections.sort(cardList);
         return String.join("", cardList);
+    }
+
+    private static PlayerInfo createPlayer(JSONObject game, String playerKey, String allDeckKey, String deckKey, String cardsKey, String clanTrKey, String clanKey) throws JSONException {
+        long clanTr = game.has(clanTrKey) ? game.getLong(clanTrKey) : 0;
+        return new PlayerInfo(
+                game.getString(playerKey),
+                game.getDouble(allDeckKey),
+                game.getDouble(deckKey),
+                InputFields.getCardsChecked(game.getString(cardsKey)),
+                clanTr,
+                game.getString(clanKey)
+        );
+    }
+
+    private static PlayerInfo createPlayer1(JSONObject game) throws JSONException {
+        return createPlayer(game, InputFields.PLAYER1, InputFields.ALL_DECK1, InputFields.DECK1, InputFields.CARDS1, InputFields.CLAN_TR1, InputFields.CLAN1);
+    }
+
+    private static PlayerInfo createPlayer2(JSONObject game) throws JSONException {
+        return createPlayer(game, InputFields.PLAYER2, InputFields.ALL_DECK2, InputFields.DECK2, InputFields.CARDS2, InputFields.CLAN_TR2, InputFields.CLAN2);
+    }
+
+    public static Game createGame(JSONObject game) throws JSONException {
+        return new Game(
+                Instant.parse(game.getString(InputFields.DATE)),
+                game.getLong(InputFields.ROUND),
+                game.getLong(InputFields.WIN),
+                createPlayer1(game),
+                createPlayer2(game)
+        );
     }
 }
