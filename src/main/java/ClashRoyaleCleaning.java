@@ -1,3 +1,5 @@
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.*;
@@ -21,9 +23,10 @@ public class ClashRoyaleCleaning {
         @Override
         protected void map(Object key, Text value, Context context) throws IOException, InterruptedException {
             try {
-                JSONObject game = new JSONObject(value.toString());
-                if (InputFields.checkFields(game)) {
-                    GameWritable gameWritable = new GameWritable(InputFields.createGame(game));
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode gameJson = objectMapper.readTree(value.toString());
+                if (InputFields.checkFields(gameJson)) {
+                    GameWritable gameWritable = new GameWritable(InputFields.createGame(gameJson));
                     context.write(new Text(gameWritable.getId()), gameWritable);
                 }
             } catch (JSONException e) {

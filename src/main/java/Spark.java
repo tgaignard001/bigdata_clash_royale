@@ -1,3 +1,5 @@
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -21,8 +23,9 @@ public class Spark {
 
         // Second part : cleaning
         JavaRDD<Tuple2<String, Game>> gamesRDD = rawRDD.map(
-                (x) -> {
-                    JSONObject gameJson = new JSONObject(x);
+                (jsonLine) -> {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    JsonNode gameJson = objectMapper.readTree(jsonLine);
                     if (InputFields.checkFields(gameJson)) {
                         Game game = new Game(InputFields.createGame(gameJson));
                         return new Tuple2<>(game.getId(), game);

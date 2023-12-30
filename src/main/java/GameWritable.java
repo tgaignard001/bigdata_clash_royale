@@ -10,6 +10,9 @@ public class GameWritable extends Game implements Writable {
     private PlayerInfoWritable player1 = new PlayerInfoWritable();
     private PlayerInfoWritable player2 = new PlayerInfoWritable();
 
+    GameWritable(){
+    }
+
     GameWritable(Instant date, long round, long win, PlayerInfoWritable player1, PlayerInfoWritable player2) {
         super(date, round, win, player1, player2);
     }
