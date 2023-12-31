@@ -53,7 +53,7 @@ public class DeckSummary implements Serializable, Cloneable {
         return this.sumDiffForce / this.nbDiffForce;
     }
 
-    public double getVictories() {
+    public long getVictories() {
         return victories;
     }
 

@@ -79,6 +79,16 @@ public class SummaryCreator {
         return sortedCards;
     }
 
+    public static DeckSummary generateSummaryFromKeyAndUniquePlayersCount(String key, long uniquePlayersCount){
+        String cards = SummaryCreator.extractCardsFromKey(key);
+        long year = SummaryCreator.extractYearFromKey(key);
+        long month = SummaryCreator.extractMonthFromKey(key);
+        SummaryDateType dateType = SummaryCreator.extractDateTypeFromKey(key);
+        DeckSummaryWritable deckSummary = new DeckSummaryWritable(cards, year, month, dateType);
+        deckSummary.setUniquePlayers(uniquePlayersCount);
+        return deckSummary;
+    }
+
     public static Matcher getKeyMatcher(String key) {
         Pattern pattern = Pattern.compile("(\\w+)(?:-([0-9]{4}))?(?:/([0-9]{2}))?");
         return pattern.matcher(key);

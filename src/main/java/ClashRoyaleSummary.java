@@ -37,12 +37,7 @@ public class ClashRoyaleSummary {
             extends Mapper<Text, LongWritable, Text, DeckSummaryWritable> {
         @Override
         protected void map(Text key, LongWritable value, Context context) throws IOException, InterruptedException {
-            String cards = SummaryCreator.extractCardsFromKey(key.toString());
-            long year = SummaryCreator.extractYearFromKey(key.toString());
-            long month = SummaryCreator.extractMonthFromKey(key.toString());
-            SummaryDateType dateType = SummaryCreator.extractDateTypeFromKey(key.toString());
-            DeckSummaryWritable deckSummary = new DeckSummaryWritable(cards, year, month, dateType);
-            deckSummary.setUniquePlayers(value.get());
+            DeckSummaryWritable deckSummary = new DeckSummaryWritable(SummaryCreator.generateSummaryFromKeyAndUniquePlayersCount(key.toString(), value.get()));
             context.write(key, deckSummary);
         }
     }
