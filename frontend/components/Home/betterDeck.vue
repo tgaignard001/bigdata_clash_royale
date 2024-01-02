@@ -2,7 +2,7 @@
 import type { ApiBody } from '~/models/api';
 import { type DeckSummary, EMPTY_DECK_SUMMARY } from '~/models/deckSummary';
 
-    const { data } = await useFetch<ApiBody>('/api/getBetterDeck');
+    const { data } = await useFetch<ApiBody>('/api/deck/getBetter');
 
     const better_deck: DeckSummary = (data.value?.content) ? data.value?.content : EMPTY_DECK_SUMMARY;
 
