@@ -1,20 +1,22 @@
 import { getAllLines } from "~/composables/decks";
 import { MAXDECKLISTSIZE } from "~/models/deckSummary";
 
-export default defineEventHandler(() => {
+export default defineEventHandler((event) => {
+    const dateType = event.context.params?.dateType;
+    const filePath = "utils/top500_" + ((dateType) ? dateType : "2023") + ".txt"
+    console.log("Params from /api/getDecks: ", dateType);
+
     return {
-        content: getDecks(),
+        content: getDecks(filePath),
     }
 })
 
-function getDecks() {
-    const selectedLines = getAllLines();
+function getDecks(filePath: string) {
+    const selectedLines = getAllLines(filePath);
     const nbLines = selectedLines.length;
     const nbPages = nbLines/MAXDECKLISTSIZE;
-    console.log(nbPages);
 
     let res = Array(Math.floor(nbPages));
-    console.log(res.length);
 
     for (let i =0; i < nbPages; i++){
         const initIndex = i*MAXDECKLISTSIZE;
@@ -24,7 +26,6 @@ function getDecks() {
             res[i] = selectedLines.slice(initIndex, initIndex + MAXDECKLISTSIZE);
         }
     }
-    console.log(res[0]);
 
     return res;
 }

@@ -2,6 +2,9 @@ export const MAXDECKLISTSIZE = 20;
 
 export type DeckSummary = {
     cards: string;
+    year: number;
+    month: number;
+    dateType: string;
     victories: number;
     uses: number;
     uniquePlayers: number;
@@ -12,6 +15,9 @@ export type DeckSummary = {
 
 export const EMPTY_DECK_SUMMARY: DeckSummary = {
     cards: "0000000000000000",
+    year: 2023,
+    month: 1,
+    dateType: "YEARLY",
     victories: -1,
     uses: -1,
     uniquePlayers: -1,

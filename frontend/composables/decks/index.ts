@@ -1,12 +1,10 @@
 import { readFileSync } from "fs";
 import type { DeckSummary } from "~/models/deckSummary";
 
-const filePath = "utils/top500.txt"
 
-export function getAllLines(){
+export function getAllLines(filePath = "utils/top500_2023.txt"){
     const allLines = readFileSync(filePath, 'utf-8').split("\n").map(extractDeckSummary) as DeckSummary[];
 
-    console.log(allLines.length);
 
     return allLines.reverse();
 }
