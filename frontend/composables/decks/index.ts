@@ -2,7 +2,7 @@ import { readFileSync } from "fs";
 import type { DeckSummary } from "~/models/deckSummary";
 import { MAXDECKLISTSIZE } from "~/models/deckSummary";
 
-const default_path = "utils/top500_2023.txt";
+const default_path = "utils/top500.txt";
 
 export function getAllLines(filePath = default_path){
     const allLines = readFileSync(filePath, 'utf-8').split("\n").map(extractDeckSummary) as DeckSummary[];

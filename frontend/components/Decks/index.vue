@@ -35,7 +35,7 @@ onMounted(fetchData);
 </script>
 
 <template>
-    <div class="flex flex-col items-center h-[81vh]">
+    <div class="flex flex-col items-center h-[83vh]">
         <div class="flex flex-row items-center content-start gap-4 w-full p-5 pl-20">
             <UToggle v-model="isDate" size="xl" />
             <USelect v-model="year" :options="years" placeholder="Select a year" :disabled="!isDate" size="xl" />

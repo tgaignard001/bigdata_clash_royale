@@ -20,6 +20,8 @@ public class TreeMapManager {
         }
     }
 
+    final private static long MIN_USES = 100;
+    final private static long MIN_UNIQUE_PLAYERS = 10;
     /**
      * Add in winRateTopk tree the winRate if the value is interesting
      *
@@ -27,20 +29,20 @@ public class TreeMapManager {
      * @param deck    DeckSummary with information of the deck
      */
     static void addWinRate(TreeMap<Double, DeckSummaryWritable> treeMap, DeckSummaryWritable deck) {
-        final long MIN_USES = 100;
-        final long MIN_UNIQUE_PLAYERS = 10;
         double victories = deck.getVictories();
         double uses = deck.getUses();
         long uniquePlayers = deck.getUniquePlayers();
-        if (uses > MIN_USES && uniquePlayers > MIN_UNIQUE_PLAYERS) {
+        if (uses > MIN_USES && uniquePlayers > MIN_UNIQUE_PLAYERS && deck.getDateType() == SummaryDateType.NONE) {
             double winRate = victories / uses;
             treeMap.put(winRate, deck.clone());
         }
     }
 
     static void addYearWinRate(TreeMap<Double, DeckSummaryWritable> treeMap, DeckSummaryWritable deck) {
-        final long year = 2022;
-        if (deck.getDateType() == SummaryDateType.YEARLY && deck.getYear() == year) {
+        final long year = 2023;
+        double uses = deck.getUses();
+        long uniquePlayers = deck.getUniquePlayers();
+        if (uses > MIN_USES && uniquePlayers > MIN_UNIQUE_PLAYERS && deck.getDateType() == SummaryDateType.YEARLY && deck.getYear() == year) {
             double winRate = deck.getVictories() / deck.getUses();
             treeMap.put(winRate, deck.clone());
         }
@@ -49,7 +51,9 @@ public class TreeMapManager {
     static void addMonthWinRate(TreeMap<Double, DeckSummaryWritable> treeMap, DeckSummaryWritable deck) {
         final long year = 2023;
         final long month = 11;
-        if (deck.getDateType() == SummaryDateType.MONTHLY && deck.getYear() == year && deck.getMonth() == month) {
+        double uses = deck.getUses();
+        long uniquePlayers = deck.getUniquePlayers();
+        if (uses > MIN_USES && uniquePlayers > MIN_UNIQUE_PLAYERS && deck.getDateType() == SummaryDateType.MONTHLY && deck.getYear() == year && deck.getMonth() == month) {
             double winRate = deck.getVictories() / deck.getUses();
             treeMap.put(winRate, deck.clone());
         }

@@ -22,6 +22,10 @@ public class UniquePlayerWritable implements Writable, Cloneable {
         this.dateType = dateType.ordinal();
     }
 
+    public String getPlayerName() {
+        return playerName;
+    }
+
     public String getCards() {
         return cards;
     }
