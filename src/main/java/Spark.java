@@ -7,20 +7,29 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.*;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.Metadata;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
 import scala.Tuple2;
+import scala.Tuple3;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Spark {
 
     private static final int K = 5;
 
     public static void main(String[] args) throws Exception {
-        final SparkConf sparkConf = new SparkConf().setAppName("SparkMapReduceClashRoyale");
-        final JavaSparkContext context = new JavaSparkContext(sparkConf);
+        SparkSession spark = SparkSession.builder()
+                .appName("SparkMapReduceClashRoyale")
+                .getOrCreate();
 
-        // First part to get data
-        JavaRDD<String> rawRDD = context.textFile(args[0],2);
+        Dataset<String> rawDataset = spark.read().textFile(args[0]);
+
+        JavaRDD<String> rawRDD = rawDataset.javaRDD();
 
         int nbPartitions = rawRDD.getNumPartitions();
         System.out.println("Nb partitions : " + nbPartitions); // default : 2
@@ -107,29 +116,135 @@ public class Spark {
                 }
         );
 
+        /*
         String outputDir = "result_summary";
         Path outputPath = new Path(outputDir);
         FileSystem fs = FileSystem.get(context.hadoopConfiguration());
 
         if (fs.exists(outputPath)) {
             fs.delete(outputPath, true); // Le deuxième paramètre indique la suppression récursive
-        }
+        }*/
         summaryRDD.saveAsTextFile("result_summary");
 
         // TopK
         List<Tuple2<String, DeckSummary>> winRateList = summaryRDD.filter(
-                        (tuple) -> TopKChecker.checkMonth(tuple._2) && TopKChecker.checkWinRate(tuple._2)
-                ).takeOrdered(K,
+                (tuple) -> TopKChecker.checkMonth(tuple._2) && TopKChecker.checkWinRate(tuple._2)
+        ).takeOrdered(K,
                 new TopKComparator(
                         (tuple1, tuple2) ->
                                 Long.compare(tuple2._2().getVictories(), tuple1._2().getVictories())
                 )
         );
 
-        for (Tuple2<String, DeckSummary> tuple : winRateList){
+        for (Tuple2<String, DeckSummary> tuple : winRateList) {
             System.out.println(tuple._2);
         }
 
+        // Spark n-gram
+        //  For now, we currently assume that the data comes from summaryRDD; later on, we will read the classes from the sequence file.
+        System.out.println("Start Ngrams");
+        JavaPairRDD<String, Long> ngramsRDD = summaryRDD.flatMapToPair(
+                entry -> {
+                    ArrayList<String> keys = NGrams.generateKeys(entry._1());
+                    List<Tuple2<String, Long>> result = new ArrayList<>();
+
+                    for (String key : keys) {
+                        result.add(new Tuple2<>(key, entry._2.getUses()));
+                    }
+
+                    return result.iterator();
+                }
+        );
+
+        JavaPairRDD<String, Long> ngramsCount = ngramsRDD.aggregateByKey(
+                0L,
+                Long::sum,
+                Long::sum
+        );
+
+        JavaPairRDD<String, Tuple2<String, Long>> ngramswByFileRDD = ngramsCount.mapToPair(
+                entry -> {
+                    System.out.println(entry._1);
+                    System.out.println(NGrams.generateNgramsOutputKey(entry._1));
+                    return new Tuple2<>(NGrams.generateNgramsOutputKey(entry._1), new Tuple2<>(entry._1, entry._2));
+                }
+        );
+
+        System.out.println("Finish compute");
+        System.out.println("Start convert");
+        JavaRDD<Row> rowRDD = ngramswByFileRDD.map(tuple -> RowFactory.create(
+                tuple._1,
+                SummaryCreator.extractDateFromKey(tuple._2._1),
+                String.valueOf(tuple._2._2)
+        ));
+
+        StructType schema = new StructType(new StructField[]{
+                new StructField("key", DataTypes.StringType, false, Metadata.empty()),
+                new StructField("date", DataTypes.StringType, false, Metadata.empty()),
+                new StructField("count", DataTypes.StringType, false, Metadata.empty())
+        });
+        System.out.println("Start Ngrams");
+        Dataset<Row> df = spark.createDataFrame(rowRDD, schema);
+        System.out.println("Start limit");
+
+        System.out.println("Start writing");
+        df.write()
+                .partitionBy("key")
+                .json("ngrams_directory");
+
+
+        /*
+        Dataset<Row> df = spark.createDataFrame(rowRDD, schema);
+
+        Dataset<Row> dfConcatenated = df.withColumn("value_concatenated", functions.concat(df.col("originalValue"), functions.lit(","), df.col("count")));
+
+        dfConcatenated = dfConcatenated.drop("originalValue").drop("count");
+
+        dfConcatenated.write()
+                .partitionBy("key")
+                .text("output_directory");
+        */
+        /*
+        JavaPairRDD<String, Iterable<Integer>> output = ngramsRDD.reduceByKey(
+                entry -> {
+
+                }
+        );
+
+
+        JavaPairRDD<String, NGramsRecord> nGramsRecordJavaPairRDD = ngramsCount.aggregateByKey(
+                new NGramsRecord(),
+                (record, value) -> {
+                    // Extract the filename from the key
+                    String fileName = NGrams.getFileNameFromKey(record.getKey());
+
+                    // Add the value to the NGramsRecord instance
+                    record.put(fileName, value);
+
+                    return record;
+                },
+                (record1, record2) -> {
+                    for (Map.Entry<String, Integer> entry : record2.getEntySet()) {
+                        record1.put(entry.getKey(), entry.getValue());
+                    }
+                    return record1;
+                }
+        );*/
+        /*
+
+        ngramsCount.foreach(
+                (entry) -> {
+                    String filePath = "output_path/key_format_" + NGrams.getFileNameFromKey(entry._1);
+                }
+        );
+        String ngram = "0c0f";
+        SummaryDateType timeGranularity = SummaryDateType.MONTHLY;
+
+
+        JavaPairRDD<String, Integer> ngramsResult = ngramsCount.filter(
+                (entry) -> NGrams.filterKey(entry._1, ngram, timeGranularity)
+        );
+        */
     }
 
 

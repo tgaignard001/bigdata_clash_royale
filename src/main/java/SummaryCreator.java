@@ -1,3 +1,5 @@
+import scala.collection.parallel.ParIterableLike;
+
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -74,7 +76,7 @@ public class SummaryCreator {
             case YEARLY:
                 return sortedCards + "-" + year;
             case MONTHLY:
-                return sortedCards + "-" + year + "/" + ((month < 10) ? 0 : "") + month;
+                return sortedCards + "-" + year + "_" + ((month < 10) ? 0 : "") + month;
         }
         return sortedCards;
     }
@@ -90,7 +92,7 @@ public class SummaryCreator {
     }
 
     public static Matcher getKeyMatcher(String key) {
-        Pattern pattern = Pattern.compile("(\\w+)(?:-([0-9]{4}))?(?:/([0-9]{2}))?");
+        Pattern pattern = Pattern.compile("(\\w+)(?:-([0-9]{4}))?(?:_([0-9]{2}))?");
         return pattern.matcher(key);
     }
 
@@ -122,12 +124,21 @@ public class SummaryCreator {
         }
     }
 
+    public static String extractDateFromKey(String key) {
+        if (extractDateTypeFromKey(key) == SummaryDateType.NONE) {
+            return "";
+        } else if (extractDateTypeFromKey(key) == SummaryDateType.MONTHLY){
+            return String.valueOf(extractMonthFromKey(key));
+        } else {
+            return String.valueOf(extractYearFromKey(key));
+        }
+    }
+
     public static SummaryDateType extractDateTypeFromKey(String key) {
         Matcher matcher = getKeyMatcher(key);
         if (matcher.matches()) {
             if (matcher.group(2) == null) {
                 return SummaryDateType.NONE;
-
             } else if (matcher.group(3) == null) {
                 return SummaryDateType.YEARLY;
             } else {
