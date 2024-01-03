@@ -11,6 +11,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,8 +24,12 @@ public class ClashRoyaleUniquePlayer {
         @Override
         protected void map(Text key, GameWritable value, Context context) {
             SummaryCreator summaryCreator = new SummaryCreator(value.getPlayer1(), value.getPlayer2(), value.getDate(), value.getWin());
-
-            playerList.addAll(summaryCreator.generateUniquePlayers());
+            ArrayList<UniquePlayer> uniquePlayers = summaryCreator.generateUniquePlayers();
+            ArrayList<UniquePlayerWritable> uniquePlayersWritable = new ArrayList<>();
+            for (UniquePlayer uniquePlayer : uniquePlayers){
+                uniquePlayersWritable.add(new UniquePlayerWritable(uniquePlayer));
+            }
+            playerList.addAll(uniquePlayersWritable);
         }
 
         @Override

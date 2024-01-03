@@ -23,9 +23,12 @@ public class ClashRoyaleSummary {
 
             SummaryCreator summaryCreator = new SummaryCreator(value.getPlayer1(), value.getPlayer2(), value.getDate(), value.getWin());
 
-            for (DeckSummaryWritable deckSummary : summaryCreator.generateSummaries()) {
-                String deckSummaryKey = SummaryCreator.generateKey(deckSummary.getSortedCards(), deckSummary.getDateType(), deckSummary.getYear(), deckSummary.getMonth());
-                context.write(new Text(deckSummaryKey), deckSummary);
+            DeckSummaryWritable deckSummaryWritable;
+
+            for (DeckSummary deckSummary : summaryCreator.generateSummaries()) {
+                deckSummaryWritable = new DeckSummaryWritable(deckSummary);
+                String deckSummaryKey = SummaryCreator.generateKey(deckSummaryWritable.getSortedCards(), deckSummaryWritable.getDateType(), deckSummaryWritable.getYear(), deckSummaryWritable.getMonth());
+                context.write(new Text(deckSummaryKey), deckSummaryWritable);
             }
         }
     }
@@ -34,12 +37,7 @@ public class ClashRoyaleSummary {
             extends Mapper<Text, LongWritable, Text, DeckSummaryWritable> {
         @Override
         protected void map(Text key, LongWritable value, Context context) throws IOException, InterruptedException {
-            String cards = SummaryCreator.extractCardsFromKey(key.toString());
-            long year = SummaryCreator.extractYearFromKey(key.toString());
-            long month = SummaryCreator.extractMonthFromKey(key.toString());
-            SummaryDateType dateType = SummaryCreator.extractDateTypeFromKey(key.toString());
-            DeckSummaryWritable deckSummary = new DeckSummaryWritable(cards, year, month, dateType);
-            deckSummary.setUniquePlayers(value.get());
+            DeckSummaryWritable deckSummary = new DeckSummaryWritable(SummaryCreator.generateSummaryFromKeyAndUniquePlayersCount(key.toString(), value.get()));
             context.write(key, deckSummary);
         }
     }
