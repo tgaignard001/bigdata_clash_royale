@@ -29,7 +29,7 @@ const data = [{
     unique_players: props.deckSummary.uniquePlayers,
     highest_clan: props.deckSummary.highestClanLevel,
     mean_winning_force: (props.deckSummary.sumDiffForce/props.deckSummary.nbDiffForce).toFixed(2),
-    winrate: (props.deckSummary.victories/props.deckSummary.uses).toFixed(2) + "%"
+    winrate: (props.deckSummary.victories/props.deckSummary.uses*100).toFixed(0) + "%"
 }]
 
 </script>

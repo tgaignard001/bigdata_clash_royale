@@ -20,6 +20,7 @@ public class TreeMapManager {
         }
     }
 
+
     static void addYearWinRate(TreeMap<Double, DeckSummaryWritable> treeMap, DeckSummaryWritable deck) {
         if (TopKChecker.checkYear(deck) && TopKChecker.checkWinRate(deck)) {
             double winRate = (double) deck.getVictories() / deck.getUses();

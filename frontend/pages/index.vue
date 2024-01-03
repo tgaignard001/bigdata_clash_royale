@@ -13,11 +13,12 @@ const items = [{
 </script>
 
 <template>
-    <div class="flex flex-col items-center gap-2 p-10 bg-[url('/ui-tex-2.png')] min-h-screen">
-        <div class="p-4 h-1/5">
-            BIGROYALEDATA
+    <div class="flex flex-row items-start gap-4 p-10 bg-[url('/ui-tex-2.png')] min-h-screen">
+        <div class="flex flex-col" >
+            <NuxtImg src="/bigRoyaleData.png" width="150"/>
+            <NuxtImg src="/balloon.png" width="150"/>
         </div>
-        <UTabs :items="items" class="w-full" >
+        <UTabs :items="items" class="w-full pt-10" >
             <template #item="{ item }">
                 <div v-if="item.key === 'home'" class="flex space-y-3">
                     <Home />
