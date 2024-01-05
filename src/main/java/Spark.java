@@ -53,7 +53,7 @@ public class Spark {
                     List<Tuple2<String, DeckSummaryWritable>> result = new ArrayList<>();
                     for (DeckSummaryWritable deckSummary : summaryCreator.generateSummaries()) {
                         String deckSummaryKey = SummaryCreator.generateKey(deckSummary.getSortedCards(), deckSummary.getDateType(), deckSummary.getYear(), deckSummary.getMonth());
-                        result.add(new Tuple2<>(deckSummaryKey, deckSummary));
+                        result.add(new Tuple2<>(deckSummaryKey, deckSummary.clone()));
                     }
                     return result.iterator();
                 }
@@ -72,7 +72,7 @@ public class Spark {
                     List<Tuple2<String, UniquePlayerWritable>> result = new ArrayList<>();
                     for (UniquePlayerWritable uniquePlayer : uniquePlayerWritables) {
                         String uniquePlayerKey = SummaryCreator.generateKey(uniquePlayer.getCards(), uniquePlayer.getDateType(), uniquePlayer.getYear(), uniquePlayer.getMonth());
-                        result.add(new Tuple2<>(uniquePlayerKey, uniquePlayer));
+                        result.add(new Tuple2<>(uniquePlayerKey, uniquePlayer.clone()));
                     }
 
                     return result.iterator();
