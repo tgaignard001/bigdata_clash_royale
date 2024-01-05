@@ -23,8 +23,8 @@ public class ClashRoyaleCleaning {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode gameJson = objectMapper.readTree(value.toString());
             if (InputFields.checkFields(gameJson)) {
-                GameWritable gameWritable = new GameWritable(InputFields.createGame(gameJson));
-                context.write(new Text(gameWritable.getId()), gameWritable);
+                GameWritable gameWritable = InputFields.createGame(gameJson);
+                context.write(new Text(gameWritable.getId()), gameWritable.clone());
             }
         }
     }

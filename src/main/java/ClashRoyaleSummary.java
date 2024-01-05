@@ -23,12 +23,9 @@ public class ClashRoyaleSummary {
 
             SummaryCreator summaryCreator = new SummaryCreator(value.getPlayer1(), value.getPlayer2(), value.getDate(), value.getWin());
 
-            DeckSummaryWritable deckSummaryWritable;
-
-            for (DeckSummary deckSummary : summaryCreator.generateSummaries()) {
-                deckSummaryWritable = new DeckSummaryWritable(deckSummary);
-                String deckSummaryKey = SummaryCreator.generateKey(deckSummaryWritable.getSortedCards(), deckSummaryWritable.getDateType(), deckSummaryWritable.getYear(), deckSummaryWritable.getMonth());
-                context.write(new Text(deckSummaryKey), deckSummaryWritable);
+            for (DeckSummaryWritable deckSummary : summaryCreator.generateSummaries()) {
+                String deckSummaryKey = SummaryCreator.generateKey(deckSummary.getSortedCards(), deckSummary.getDateType(), deckSummary.getYear(), deckSummary.getMonth());
+                context.write(new Text(deckSummaryKey), deckSummary);
             }
         }
     }
@@ -37,8 +34,8 @@ public class ClashRoyaleSummary {
             extends Mapper<Text, LongWritable, Text, DeckSummaryWritable> {
         @Override
         protected void map(Text key, LongWritable value, Context context) throws IOException, InterruptedException {
-            DeckSummaryWritable deckSummary = new DeckSummaryWritable(SummaryCreator.generateSummaryFromKeyAndUniquePlayersCount(key.toString(), value.get()));
-            context.write(key, deckSummary);
+            DeckSummaryWritable deckSummary = SummaryCreator.generateSummaryFromKeyAndUniquePlayersCount(key.toString(), value.get());
+            context.write(key, deckSummary.clone());
         }
     }
 

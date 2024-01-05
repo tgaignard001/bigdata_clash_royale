@@ -1,22 +1,15 @@
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.Text;
-import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import scala.Tuple2;
-import scala.Tuple3;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Spark {
 
@@ -35,13 +28,13 @@ public class Spark {
         System.out.println("Nb partitions : " + nbPartitions); // default : 2
 
         // Second part : cleaning
-        JavaRDD<Tuple2<String, Game>> gamesRDD = rawRDD.map(
+        JavaRDD<Tuple2<String, GameWritable>> gamesRDD = rawRDD.map(
                 (jsonLine) -> {
                     ObjectMapper objectMapper = new ObjectMapper();
                     JsonNode gameJson = objectMapper.readTree(jsonLine);
                     if (InputFields.checkFields(gameJson)) {
-                        Game game = new Game(InputFields.createGame(gameJson));
-                        return new Tuple2<>(game.getId(), game);
+                        GameWritable gameWritable = InputFields.createGame(gameJson);
+                        return new Tuple2<>(gameWritable.getId(), gameWritable);
                     }
                     return null;
                 }
@@ -52,13 +45,13 @@ public class Spark {
         // Third part : cleaning
 
         // Map DeckSummary
-        JavaPairRDD<String, DeckSummary> deckSummaries = gamesRDD.flatMapToPair(
+        JavaPairRDD<String, DeckSummaryWritable> deckSummaries = gamesRDD.flatMapToPair(
                 entry -> {
-                    Game game = entry._2;
-                    SummaryCreator summaryCreator = new SummaryCreator(game.getPlayer1(), game.getPlayer2(), game.getDate(), game.getWin());
+                    GameWritable gameWritable = entry._2;
+                    SummaryCreator summaryCreator = new SummaryCreator(gameWritable.getPlayer1(), gameWritable.getPlayer2(), gameWritable.getDate(), gameWritable.getWin());
 
-                    List<Tuple2<String, DeckSummary>> result = new ArrayList<>();
-                    for (DeckSummary deckSummary : summaryCreator.generateSummaries()) {
+                    List<Tuple2<String, DeckSummaryWritable>> result = new ArrayList<>();
+                    for (DeckSummaryWritable deckSummary : summaryCreator.generateSummaries()) {
                         String deckSummaryKey = SummaryCreator.generateKey(deckSummary.getSortedCards(), deckSummary.getDateType(), deckSummary.getYear(), deckSummary.getMonth());
                         result.add(new Tuple2<>(deckSummaryKey, deckSummary));
                     }
@@ -66,18 +59,18 @@ public class Spark {
                 }
         ).distinct();
 
-        JavaPairRDD<String, Iterable<DeckSummary>> deckSummaryGroupedByKey = deckSummaries.groupByKey();
+        JavaPairRDD<String, Iterable<DeckSummaryWritable>> deckSummaryGroupedByKey = deckSummaries.groupByKey();
         System.out.println("Nb decks after filer : " + deckSummaryGroupedByKey.count());
 
         // Map Unique Player
-        JavaPairRDD<String, UniquePlayer> deckWithPlayerPairRDD = gamesRDD.flatMapToPair(
+        JavaPairRDD<String, UniquePlayerWritable> deckWithPlayerPairRDD = gamesRDD.flatMapToPair(
                 entry -> {
-                    Game game = entry._2;
-                    SummaryCreator summaryCreator = new SummaryCreator(game.getPlayer1(), game.getPlayer2(), game.getDate(), game.getWin());
-                    ArrayList<UniquePlayer> uniquePlayers = summaryCreator.generateUniquePlayers();
+                    GameWritable gameWritable = entry._2;
+                    SummaryCreator summaryCreator = new SummaryCreator(gameWritable.getPlayer1(), gameWritable.getPlayer2(), gameWritable.getDate(), gameWritable.getWin());
+                    ArrayList<UniquePlayerWritable> uniquePlayerWritables = summaryCreator.generateUniquePlayers();
 
-                    List<Tuple2<String, UniquePlayer>> result = new ArrayList<>();
-                    for (UniquePlayer uniquePlayer : uniquePlayers) {
+                    List<Tuple2<String, UniquePlayerWritable>> result = new ArrayList<>();
+                    for (UniquePlayerWritable uniquePlayer : uniquePlayerWritables) {
                         String uniquePlayerKey = SummaryCreator.generateKey(uniquePlayer.getCards(), uniquePlayer.getDateType(), uniquePlayer.getYear(), uniquePlayer.getMonth());
                         result.add(new Tuple2<>(uniquePlayerKey, uniquePlayer));
                     }
@@ -86,14 +79,14 @@ public class Spark {
                 }
         );
 
-        JavaPairRDD<String, DeckSummary> deckWithNumberUniquePlayerRDD = deckWithPlayerPairRDD
+        JavaPairRDD<String, DeckSummaryWritable> deckWithNumberUniquePlayerRDD = deckWithPlayerPairRDD
                 .groupByKey()
                 .mapToPair(tuple -> {
                     String key = tuple._1();
-                    Iterable<UniquePlayer> iterable = tuple._2();
+                    Iterable<UniquePlayerWritable> iterable = tuple._2();
 
                     Set<String> uniquePlayersSet = new HashSet<>();
-                    for (UniquePlayer uniquePlayer : iterable) {
+                    for (UniquePlayerWritable uniquePlayer : iterable) {
                         uniquePlayersSet.add(uniquePlayer.playerName);
                     }
                     return new Tuple2<>(key, SummaryCreator.generateSummaryFromKeyAndUniquePlayersCount(key, uniquePlayersSet.size()));
@@ -101,18 +94,18 @@ public class Spark {
 
 
         // Merge Unique Players and DeckSummary
-        JavaPairRDD<String, Tuple2<Iterable<DeckSummary>, DeckSummary>> joinedRDD = deckSummaryGroupedByKey.join(deckWithNumberUniquePlayerRDD);
-        JavaPairRDD<String, DeckSummary> summaryRDD = joinedRDD.mapToPair(
+        JavaPairRDD<String, Tuple2<Iterable<DeckSummaryWritable>, DeckSummaryWritable>> joinedRDD = deckSummaryGroupedByKey.join(deckWithNumberUniquePlayerRDD);
+        JavaPairRDD<String, DeckSummaryWritable> summaryRDD = joinedRDD.mapToPair(
                 (value) -> {
                     String key = value._1();
-                    Tuple2<Iterable<DeckSummary>, DeckSummary> iterable = value._2();
-                    DeckSummary deckSummary = iterable._2();
+                    Tuple2<Iterable<DeckSummaryWritable>, DeckSummaryWritable> iterable = value._2();
+                    DeckSummaryWritable deckSummaryWritable = iterable._2();
 
-                    for (DeckSummary deckSummaryElement : iterable._1()) {
-                        deckSummary.updateDeckSummary(deckSummaryElement);
+                    for (DeckSummaryWritable deckSummaryElement : iterable._1()) {
+                        deckSummaryWritable.updateDeckSummary(deckSummaryElement);
                     }
 
-                    return new Tuple2<>(key, deckSummary.clone());
+                    return new Tuple2<>(key, deckSummaryWritable.clone());
                 }
         );
 
@@ -127,7 +120,7 @@ public class Spark {
         summaryRDD.saveAsTextFile("result_summary");
 
         // TopK
-        List<Tuple2<String, DeckSummary>> winRateList = summaryRDD.filter(
+        List<Tuple2<String, DeckSummaryWritable>> winRateList = summaryRDD.filter(
                 (tuple) -> TopKChecker.checkMonth(tuple._2) && TopKChecker.checkWinRate(tuple._2)
         ).takeOrdered(K,
                 new TopKComparator(
@@ -136,9 +129,10 @@ public class Spark {
                 )
         );
 
-        for (Tuple2<String, DeckSummary> tuple : winRateList) {
+        for (Tuple2<String, DeckSummaryWritable> tuple : winRateList) {
             System.out.println(tuple._2);
         }
+
 
         // Spark n-gram
         //  For now, we currently assume that the data comes from summaryRDD; later on, we will read the classes from the sequence file.
@@ -191,61 +185,6 @@ public class Spark {
         df.write()
                 .partitionBy("key")
                 .json("ngrams_directory");
-
-
-        /*
-        Dataset<Row> df = spark.createDataFrame(rowRDD, schema);
-
-        Dataset<Row> dfConcatenated = df.withColumn("value_concatenated", functions.concat(df.col("originalValue"), functions.lit(","), df.col("count")));
-
-        dfConcatenated = dfConcatenated.drop("originalValue").drop("count");
-
-        dfConcatenated.write()
-                .partitionBy("key")
-                .text("output_directory");
-        */
-        /*
-        JavaPairRDD<String, Iterable<Integer>> output = ngramsRDD.reduceByKey(
-                entry -> {
-
-                }
-        );
-
-
-        JavaPairRDD<String, NGramsRecord> nGramsRecordJavaPairRDD = ngramsCount.aggregateByKey(
-                new NGramsRecord(),
-                (record, value) -> {
-                    // Extract the filename from the key
-                    String fileName = NGrams.getFileNameFromKey(record.getKey());
-
-                    // Add the value to the NGramsRecord instance
-                    record.put(fileName, value);
-
-                    return record;
-                },
-                (record1, record2) -> {
-                    for (Map.Entry<String, Integer> entry : record2.getEntySet()) {
-                        record1.put(entry.getKey(), entry.getValue());
-                    }
-                    return record1;
-                }
-        );*/
-        /*
-
-        ngramsCount.foreach(
-                (entry) -> {
-                    String filePath = "output_path/key_format_" + NGrams.getFileNameFromKey(entry._1);
-                }
-        );
-        String ngram = "0c0f";
-        SummaryDateType timeGranularity = SummaryDateType.MONTHLY;
-
-
-        JavaPairRDD<String, Integer> ngramsResult = ngramsCount.filter(
-                (entry) -> NGrams.filterKey(entry._1, ngram, timeGranularity)
-        );
-        */
     }
-
 
 }
