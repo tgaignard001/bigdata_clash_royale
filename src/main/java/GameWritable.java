@@ -3,30 +3,52 @@ import org.apache.hadoop.io.Writable;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.io.Serializable;
 import java.time.Instant;
 
-public class GameWritable extends Game implements Writable {
+public class GameWritable implements Cloneable, Serializable, Writable {
+    private String id;
+    private Instant date;
+    private long round;
+    private long win;
     private PlayerInfoWritable player1 = new PlayerInfoWritable();
     private PlayerInfoWritable player2 = new PlayerInfoWritable();
 
-    GameWritable(){
-    }
+    GameWritable() {}
 
     GameWritable(Instant date, long round, long win, PlayerInfoWritable player1, PlayerInfoWritable player2) {
-        super(date, round, win, player1, player2);
+        this.date = date;
+        this.round = round;
+        this.win = win;
+        this.player1 = player1;
+        this.player2 = player2;
+        String prefix = date.toString()+"-"+round;
+        String suffix = player1.getPlayer().compareTo(player2.getPlayer()) < 0 ? player1.getPlayer() + player2.getPlayer() : player2.getPlayer() + player1.getPlayer();
+        this.id = prefix +"-"+ suffix;
     }
 
-    GameWritable(Game game) {
-        super(game.getDate(), game.getRound(), game.getWin(), game.getPlayer1(), game.getPlayer2());
-        this.player1 = new PlayerInfoWritable(game.getPlayer1());
-        this.player2 = new PlayerInfoWritable(game.getPlayer2());
+    public String getId() {
+        return id;
     }
 
     public PlayerInfoWritable getPlayer1() {
         return player1;
     }
+
     public PlayerInfoWritable getPlayer2() {
         return player2;
+    }
+
+    public long getWin() {
+        return win;
+    }
+
+    public Instant getDate() {
+        return date;
+    }
+
+    public long getRound() {
+        return round;
     }
 
     @Override
@@ -51,18 +73,27 @@ public class GameWritable extends Game implements Writable {
 
     @Override
     public String toString() {
-        return super.toString();
+        return "id: " + id +
+                ", date: " + date +
+                ", round: " + round +
+                ", win: " + win +
+                ", player1: " + player1.getPlayer() +
+                ", player2: " + player2.getPlayer();
     }
 
     @Override
     public GameWritable clone() {
-        GameWritable clone = (GameWritable) super.clone();
-        clone.id = this.id;
-        clone.date = this.date;
-        clone.round = this.round;
-        clone.win = this.win;
-        clone.player1 = this.player1;
-        clone.player2 = this.player2;
-        return clone;
+        try {
+            GameWritable clone = (GameWritable) super.clone();
+            clone.id = this.id;
+            clone.date = this.date;
+            clone.round = this.round;
+            clone.win = this.win;
+            clone.player1 = this.player1;
+            clone.player2 = this.player2;
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

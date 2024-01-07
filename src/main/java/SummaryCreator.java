@@ -1,5 +1,3 @@
-import scala.collection.parallel.ParIterableLike;
-
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -13,10 +11,10 @@ public class SummaryCreator {
     private final long year;
     private final Month month;
     private final long win;
-    private final PlayerInfo player1;
-    private final PlayerInfo player2;
+    private final PlayerInfoWritable player1;
+    private final PlayerInfoWritable player2;
 
-    public SummaryCreator(PlayerInfo player1, PlayerInfo player2, Instant date, long win) {
+    public SummaryCreator(PlayerInfoWritable player1, PlayerInfoWritable player2, Instant date, long win) {
         this.player1 = player1.clone();
         this.player2 = player2.clone();
         this.diffForce = player1.getDeck() - player2.getDeck();
@@ -26,46 +24,46 @@ public class SummaryCreator {
         this.win = win;
     }
 
-    public ArrayList<DeckSummary> generateSummaries() {
-        ArrayList<DeckSummary> summaryList = new ArrayList<>();
+    public ArrayList<DeckSummaryWritable> generateSummaries() {
+        ArrayList<DeckSummaryWritable> summaryList = new ArrayList<>();
         for (SummaryDateType dateType : SummaryDateType.values()) {
-            DeckSummary deckSummary1 = new DeckSummary(player1.getCards(), year, month.getValue(), dateType);
-            DeckSummary deckSummary2 = new DeckSummary(player2.getCards(), year, month.getValue(), dateType);
+            DeckSummaryWritable deckSummaryWritable1 = new DeckSummaryWritable(player1.getCards(), year, month.getValue(), dateType);
+            DeckSummaryWritable deckSummaryWritable2 = new DeckSummaryWritable(player2.getCards(), year, month.getValue(), dateType);
 
             if (win == 1) {
-                deckSummary1.incVictories();
+                deckSummaryWritable1.incVictories();
             } else {
-                deckSummary2.incVictories();
+                deckSummaryWritable2.incVictories();
             }
 
-            deckSummary1.incUses();
-            deckSummary2.incUses();
+            deckSummaryWritable1.incUses();
+            deckSummaryWritable2.incUses();
 
-            deckSummary1.setHighestClanLevel(player1.getClanTr());
-            deckSummary2.setHighestClanLevel(player2.getClanTr());
+            deckSummaryWritable1.setHighestClanLevel(player1.getClanTr());
+            deckSummaryWritable2.setHighestClanLevel(player2.getClanTr());
 
-            deckSummary1.addDiffForce(diffForce);
-            deckSummary2.addDiffForce(-diffForce);
+            deckSummaryWritable1.addDiffForce(diffForce);
+            deckSummaryWritable2.addDiffForce(-diffForce);
 
-            deckSummary1.incNbDiffForce();
-            deckSummary2.incNbDiffForce();
+            deckSummaryWritable1.incNbDiffForce();
+            deckSummaryWritable2.incNbDiffForce();
 
-            summaryList.add(deckSummary1);
-            summaryList.add(deckSummary2);
+            summaryList.add(deckSummaryWritable1);
+            summaryList.add(deckSummaryWritable2);
         }
         return summaryList;
     }
 
-    public ArrayList<UniquePlayer> generateUniquePlayers() {
-        ArrayList<UniquePlayer> uniquePlayerList = new ArrayList<>();
+    public ArrayList<UniquePlayerWritable> generateUniquePlayers() {
+        ArrayList<UniquePlayerWritable> uniquePlayerWritableList = new ArrayList<>();
         for (SummaryDateType dateType : SummaryDateType.values()) {
-            UniquePlayer uniquePlayer1 = new UniquePlayer(player1.getPlayer(), player1.getCards(), year, month.getValue(), dateType);
-            UniquePlayer uniquePlayer2 = new UniquePlayer(player2.getPlayer(), player2.getCards(), year, month.getValue(), dateType);
+            UniquePlayerWritable uniquePlayerWritable1 = new UniquePlayerWritable(player1.getPlayer(), player1.getCards(), year, month.getValue(), dateType);
+            UniquePlayerWritable uniquePlayerWritable2 = new UniquePlayerWritable(player2.getPlayer(), player2.getCards(), year, month.getValue(), dateType);
 
-            uniquePlayerList.add(uniquePlayer1);
-            uniquePlayerList.add(uniquePlayer2);
+            uniquePlayerWritableList.add(uniquePlayerWritable1);
+            uniquePlayerWritableList.add(uniquePlayerWritable2);
         }
-        return uniquePlayerList;
+        return uniquePlayerWritableList;
     }
 
     public static String generateKey(String cards, SummaryDateType dateType, long year, long month) {
@@ -81,7 +79,7 @@ public class SummaryCreator {
         return sortedCards;
     }
 
-    public static DeckSummary generateSummaryFromKeyAndUniquePlayersCount(String key, long uniquePlayersCount){
+    public static DeckSummaryWritable generateSummaryFromKeyAndUniquePlayersCount(String key, long uniquePlayersCount){
         String cards = SummaryCreator.extractCardsFromKey(key);
         long year = SummaryCreator.extractYearFromKey(key);
         long month = SummaryCreator.extractMonthFromKey(key);

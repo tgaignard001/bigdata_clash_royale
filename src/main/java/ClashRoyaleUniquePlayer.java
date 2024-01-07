@@ -24,10 +24,10 @@ public class ClashRoyaleUniquePlayer {
         @Override
         protected void map(Text key, GameWritable value, Context context) {
             SummaryCreator summaryCreator = new SummaryCreator(value.getPlayer1(), value.getPlayer2(), value.getDate(), value.getWin());
-            ArrayList<UniquePlayer> uniquePlayers = summaryCreator.generateUniquePlayers();
+            ArrayList<UniquePlayerWritable> uniquePlayerWritables = summaryCreator.generateUniquePlayers();
             ArrayList<UniquePlayerWritable> uniquePlayersWritable = new ArrayList<>();
-            for (UniquePlayer uniquePlayer : uniquePlayers){
-                uniquePlayersWritable.add(new UniquePlayerWritable(uniquePlayer));
+            for (UniquePlayerWritable uniquePlayerWritable : uniquePlayerWritables){
+                uniquePlayersWritable.add(uniquePlayerWritable.clone());
             }
             playerList.addAll(uniquePlayersWritable);
         }

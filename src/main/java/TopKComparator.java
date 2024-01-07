@@ -3,7 +3,7 @@ import scala.Tuple2;
 
 import java.util.Comparator;
 
-public class TopKComparator implements Comparator<Tuple2<String, DeckSummary>>, Serializable {
+public class TopKComparator implements Comparator<Tuple2<String, DeckSummaryWritable>>, Serializable {
     private final DeckSummaryComparator comparator;
 
     public TopKComparator(DeckSummaryComparator comparator) {
@@ -11,7 +11,7 @@ public class TopKComparator implements Comparator<Tuple2<String, DeckSummary>>, 
     }
 
     @Override
-    public int compare(Tuple2<String, DeckSummary> tuple1, Tuple2<String, DeckSummary> tuple2) {
+    public int compare(Tuple2<String, DeckSummaryWritable> tuple1, Tuple2<String, DeckSummaryWritable> tuple2) {
         return comparator.compare(tuple1, tuple2);
     }
 

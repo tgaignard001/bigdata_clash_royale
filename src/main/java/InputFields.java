@@ -63,9 +63,9 @@ public class InputFields {
         return String.join("", cardList);
     }
 
-    private static PlayerInfo createPlayer(JsonNode game, String playerKey, String allDeckKey, String deckKey, String cardsKey, String clanTrKey, String clanKey) {
+    private static PlayerInfoWritable createPlayer(JsonNode game, String playerKey, String allDeckKey, String deckKey, String cardsKey, String clanTrKey, String clanKey) {
         long clanTr = game.has(clanTrKey) ? game.get(clanTrKey).asLong() : 0;
-        return new PlayerInfo(
+        return new PlayerInfoWritable(
                 game.get(playerKey).asText(),
                 game.get(allDeckKey).asDouble(),
                 game.get(deckKey).asDouble(),
@@ -75,16 +75,16 @@ public class InputFields {
         );
     }
 
-    private static PlayerInfo createPlayer1(JsonNode game) {
+    private static PlayerInfoWritable createPlayer1(JsonNode game) {
         return createPlayer(game, InputFields.PLAYER1, InputFields.ALL_DECK1, InputFields.DECK1, InputFields.CARDS1, InputFields.CLAN_TR1, InputFields.CLAN1);
     }
 
-    private static PlayerInfo createPlayer2(JsonNode game) {
+    private static PlayerInfoWritable createPlayer2(JsonNode game) {
         return createPlayer(game, InputFields.PLAYER2, InputFields.ALL_DECK2, InputFields.DECK2, InputFields.CARDS2, InputFields.CLAN_TR2, InputFields.CLAN2);
     }
 
-    public static Game createGame(JsonNode game) {
-        return new Game(
+    public static GameWritable createGame(JsonNode game) {
+        return new GameWritable(
                 Instant.parse(game.get(InputFields.DATE).asText()),
                 game.get(InputFields.ROUND).asLong(),
                 game.get(InputFields.WIN).asLong(),
