@@ -1,46 +1,29 @@
-import java.io.Serializable;
+package bigdata;
 
-public class PlayerInfo implements Cloneable, Serializable {
-    protected String player;
-    protected double allDeck;
-    protected double deck;
-    protected String cards;
-    protected long clanTr;
-    protected String clan;
+public class PlayerInfo implements Cloneable {
+    public String player;
+    public double allDeck;
+    public double deck;
+    public String cards;
+    public long clanTr;
+    public String clan;
 
-    PlayerInfo() {}
+    public PlayerInfo(){
+        player = "null";
+        allDeck = -1;
+        deck = -1;
+        cards = "0102030405060708";
+        clanTr = -1;
+        clan = "null";
+    }
 
-    PlayerInfo(String player, double allDeck, double deck, String cards, long clanTr, String clan) {
+    public PlayerInfo(String player, double allDeck, double deck, String cards, long clanTr, String clan) {
         this.player = player;
         this.allDeck = allDeck;
         this.deck = deck;
         this.cards = cards;
         this.clanTr = clanTr;
         this.clan = clan;
-    }
-
-    public String getPlayer() {
-        return player;
-    }
-
-    public String getCards() {
-        return cards;
-    }
-
-    public long getClanTr() {
-        return clanTr;
-    }
-
-    public double getDeck() {
-        return deck;
-    }
-
-    public double getAllDeck() {
-        return allDeck;
-    }
-
-    public String getClan() {
-        return clan;
     }
 
     @Override
@@ -74,8 +57,8 @@ public class PlayerInfo implements Cloneable, Serializable {
         if (obj instanceof PlayerInfo){
             PlayerInfo player2 = (PlayerInfo) obj;
             String cards1 = InputFields.sortCards(this.cards);
-            String cards2 = InputFields.sortCards(player2.getCards());
-            return (this.player.equals(player2.getPlayer()) && cards1.equals(cards2));
+            String cards2 = InputFields.sortCards(player2.cards);
+            return (this.player.equals(player2.player) && cards1.equals(cards2));
         }
         return false;
     }
