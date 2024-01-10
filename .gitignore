@@ -24,5 +24,8 @@ TestResults.xml
 
 target
 node_modules/
+cr_games_small.json
+cr_few_games.txt
+installation_spark.md
 
 data

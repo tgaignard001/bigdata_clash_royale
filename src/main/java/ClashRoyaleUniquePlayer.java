@@ -48,7 +48,7 @@ public class ClashRoyaleUniquePlayer {
         public void reduce(Text key, Iterable<UniquePlayerWritable> values, Context context) throws IOException, InterruptedException {
             HashSet<String> playerList = new HashSet<>();
             while (values.iterator().hasNext()) {
-                playerList.add(values.iterator().next().getPlayerName());
+                playerList.add(values.iterator().next().playerName);
             }
             context.write(key, new LongWritable(playerList.size()));
         }
