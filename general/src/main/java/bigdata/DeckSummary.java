@@ -1,25 +1,24 @@
 package bigdata;
 
-public class DeckSummary implements Cloneable{
-    protected String sortedCards;
-    protected long year;
-    protected long month;
-    protected int dateType;
-    protected long victories;
-    protected long uses;
-    protected long uniquePlayers;
-    protected long highestClanLevel;
-    protected double sumDiffForce;
-    protected long nbDiffForce;
+import java.time.Instant;
 
-    DeckSummary() {
-    }
+public class DeckSummary implements Cloneable {
+    public String sortedCards;
+    public Instant date;
+    public SummaryDateType dateType;
+    public long victories;
+    public long uses;
+    public long uniquePlayers;
+    public long highestClanLevel;
+    public double sumDiffForce;
+    public long nbDiffForce;
 
-    DeckSummary(String cards, long year, long month, SummaryDateType dateType) {
+    DeckSummary() {}
+
+    DeckSummary(String cards, Instant date, SummaryDateType dateType) {
         this.sortedCards = InputFields.sortCards(cards);
-        this.year = year;
-        this.month = month;
-        this.dateType = dateType.ordinal();
+        this.date = date;
+        this.dateType = dateType;
         this.victories = 0;
         this.uses = 0;
         this.uniquePlayers = 0;
@@ -28,36 +27,8 @@ public class DeckSummary implements Cloneable{
         this.nbDiffForce = 0;
     }
 
-    public String getSortedCards() {
-        return sortedCards;
-    }
-
-    public SummaryDateType getDateType() {
-        return SummaryDateType.getDateType(dateType);
-    }
-
-    public long getYear() {
-        return year;
-    }
-
-    public long getMonth() {
-        return month;
-    }
-
     public double getMeanDiffForce() {
         return this.sumDiffForce / this.nbDiffForce;
-    }
-
-    public long getVictories() {
-        return victories;
-    }
-
-    public long getUses() {
-        return uses;
-    }
-
-    public long getUniquePlayers() {
-        return uniquePlayers;
     }
 
     public void incVictories() {
@@ -70,10 +41,6 @@ public class DeckSummary implements Cloneable{
 
     public void setHighestClanLevel(long highestClanLevel) {
         this.highestClanLevel = highestClanLevel;
-    }
-
-    public void setUniquePlayers(long uniquePlayers) {
-        this.uniquePlayers = uniquePlayers;
     }
 
     public void addDiffForce(double diffForce) {
@@ -91,23 +58,20 @@ public class DeckSummary implements Cloneable{
         this.uniquePlayers = Math.max(deckSummary.uniquePlayers, this.uniquePlayers);
         this.sumDiffForce += deckSummary.sumDiffForce;
         this.nbDiffForce += deckSummary.nbDiffForce;
-        this.year = (this.year == 0) ? deckSummary.year : this.year;
-        this.month = (this.month == 0) ? deckSummary.month : this.month;
+        this.date = (this.date == null) ? deckSummary.date : this.date;
     }
 
     @Override
     public String toString() {
         return "{" +
-                "\"cards\": \"" + sortedCards + "\"" +
-                ", \"year\": " + year +
-                ", \"month\": " + month +
-                ", \"dateType\": \"" + SummaryDateType.getDateType(dateType) + "\"" +
+                "\"sortedCards\": \"" + sortedCards + '\"' +
+                ", \"date\": \"" + date + "\"" +
+                ", \"dateType\": \"" + dateType + "\"" +
                 ", \"victories\": " + victories +
                 ", \"uses\": " + uses +
                 ", \"uniquePlayers\": " + uniquePlayers +
                 ", \"highestClanLevel\": " + highestClanLevel +
-                ", \"sumDiffForce\": " + sumDiffForce +
-                ", \"nbDiffForce\": " + nbDiffForce +
+                ", \"MeanDiffForce\": " + getMeanDiffForce() +
                 '}';
     }
 
@@ -116,8 +80,7 @@ public class DeckSummary implements Cloneable{
         try {
             DeckSummary clone = (DeckSummary) super.clone();
             clone.sortedCards = this.sortedCards;
-            clone.year = this.year;
-            clone.month = this.month;
+            clone.date = this.date;
             clone.dateType = this.dateType;
             clone.victories = this.victories;
             clone.uses = this.uses;

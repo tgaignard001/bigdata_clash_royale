@@ -11,7 +11,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -27,11 +27,11 @@ public class ClashRoyaleCleaning {
             if (InputFields.checkFields(gameJson)) {
                 long clanTr1 = gameJson.has(InputFields.CLAN_TR1) ? gameJson.get(InputFields.CLAN_TR1).asLong() : 0;
                 long clanTr2 = gameJson.has(InputFields.CLAN_TR2) ? gameJson.get(InputFields.CLAN_TR2).asLong() : 0;
-                GameWritable gameWritable = new GameWritable(new Game(
+                GameWritable gameWritable = new GameWritable(
                         Instant.parse(gameJson.get(InputFields.DATE).asText()),
                         gameJson.get(InputFields.ROUND).asLong(),
                         gameJson.get(InputFields.WIN).asLong(),
-                        new PlayerInfo(
+                        new PlayerInfoWritable(
                                 gameJson.get(InputFields.PLAYER1).asText(),
                                 gameJson.get(InputFields.ALL_DECK1).asDouble(),
                                 gameJson.get(InputFields.DECK1).asDouble(),
@@ -39,14 +39,14 @@ public class ClashRoyaleCleaning {
                                 clanTr1,
                                 gameJson.get(InputFields.CLAN1).asText()
                         ),
-                        new PlayerInfo(
+                        new PlayerInfoWritable(
                                 gameJson.get(InputFields.PLAYER2).asText(),
                                 gameJson.get(InputFields.ALL_DECK2).asDouble(),
                                 gameJson.get(InputFields.DECK2).asDouble(),
                                 InputFields.getCardsChecked(gameJson.get(InputFields.CARDS2).asText()),
                                 clanTr2,
                                 gameJson.get(InputFields.CLAN2).asText()
-                        ))
+                        )
                 );
                 context.write(new Text(gameWritable.getId()), gameWritable);
             }
@@ -73,7 +73,7 @@ public class ClashRoyaleCleaning {
         job.setReducerClass(ClashRoyaleCleaningReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(GameWritable.class);
-        job.setOutputFormatClass(TextOutputFormat.class);
+        job.setOutputFormatClass(SequenceFileOutputFormat.class);
         job.setInputFormatClass(TextInputFormat.class);
         FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));

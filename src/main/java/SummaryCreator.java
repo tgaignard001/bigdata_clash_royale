@@ -92,7 +92,7 @@ public class SummaryCreator {
     }
 
     public static Matcher getKeyMatcher(String key) {
-        Pattern pattern = Pattern.compile("(\\w+)(?:-([0-9]{4}))?(?:_([0-9]{2}))?");
+        Pattern pattern = Pattern.compile("(\\w+)(?:-([0-9]{4}))?(?:_((M | W)[0-9]{2}))?");
         return pattern.matcher(key);
     }
 

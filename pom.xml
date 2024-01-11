@@ -9,7 +9,9 @@
 		<module>hadoop</module>
 		<module>spark</module>
 		<module>general</module>
-	</modules>
+        <module>hadoop_summary</module>
+        <module>hadoop_uniquePlayers</module>
+    </modules>
 	<properties>
 		<maven.compiler.source>8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>

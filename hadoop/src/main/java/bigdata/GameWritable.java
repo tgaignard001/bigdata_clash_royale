@@ -8,56 +8,69 @@ import java.time.Instant;
 
 public class GameWritable implements Cloneable, Writable {
 
-    private Game game;
-    private PlayerInfoWritable player1;
-    private PlayerInfoWritable player2;
+    public String id;
+    public Instant date;
+    public long round;
+    public long win;
+    public PlayerInfoWritable player1 = new PlayerInfoWritable();
+    public PlayerInfoWritable player2 = new PlayerInfoWritable();
 
     public GameWritable(){
-        game = new Game();
-        player1 = new PlayerInfoWritable();
-        player2 = new PlayerInfoWritable();
     }
-
-    public GameWritable(Game game){
-        this.game = game;
-        this.player1 = new PlayerInfoWritable(game.player1);
-        this.player2 = new PlayerInfoWritable(game.player2);
+    public GameWritable(Instant date, long round, long win, PlayerInfoWritable player1, PlayerInfoWritable player2) {
+        this.date = date;
+        this.round = round;
+        this.win = win;
+        this.player1 = player1;
+        this.player2 = player2;
+        String prefix = date.toString()+"-"+round;
+        String suffix = player1.player.compareTo(player2.player) < 0 ? player1.player + player2.player : player2.player + player1.player;
+        this.id = prefix + suffix;
     }
-
     public String getId(){
-        return game.id;
+        return id;
     }
 
     @Override
     public void write(DataOutput out) throws IOException {
-        out.writeUTF(game.id);
-        out.writeUTF(game.date.toString());
-        out.writeLong(game.round);
-        out.writeLong(game.win);
+        out.writeUTF(id);
+        out.writeUTF(date.toString());
+        out.writeLong(round);
+        out.writeLong(win);
         player1.write(out);
         player2.write(out);
     }
 
     @Override
     public void readFields(DataInput in) throws IOException {
-        game.id = in.readUTF();
-        game.date = Instant.parse(in.readUTF());
-        game.round = in.readLong();
-        game.win = in.readLong();
+        id = in.readUTF();
+        date = Instant.parse(in.readUTF());
+        round = in.readLong();
+        win = in.readLong();
         player1.readFields(in);
         player2.readFields(in);
     }
 
     @Override
     public String toString() {
-        return game.toString();
+        return "GameWritable{" +
+                "id='" + id + '\'' +
+                ", date=" + date +
+                ", round=" + round +
+                ", win=" + win +
+                ", player1=" + player1 +
+                ", player2=" + player2 +
+                '}';
     }
 
     @Override
     public GameWritable clone() {
         try {
             GameWritable clone = (GameWritable) super.clone();
-            clone.game = game.clone();
+            clone.id = this.id;
+            clone.date = this.date;
+            clone.round = this.round;
+            clone.win = this.win;
             clone.player1 = player1.clone();
             clone.player2 = player2.clone();
             return clone;
