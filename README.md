@@ -1,4 +1,4 @@
-# bigdata_clash_royale
+# bigdata clashRoyale
 
 data dans LSD: /user/auber/data_ple/clashroyale/gdc_battles.nljson
                                                 wc_battles
@@ -8,6 +8,13 @@ Data cleaning:
     Pattern éléments distinct (Pour une même date, plusieurs parties car bo3 enregistrées à la fin)
     (Joueur1 VS joueur2 et Joueur2 VS Joueur1)
 
+## Comment compiler le code
+Pour compiler le code il faut se placer à la racine du
+projet et faire la commande:
+```bash
+    mvn clean package
+```
+Cela va générer tous les package de tous les modules.
 
 ## Description des agrégats
 ```json
