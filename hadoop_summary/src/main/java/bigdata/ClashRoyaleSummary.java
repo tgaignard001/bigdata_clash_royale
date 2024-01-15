@@ -29,7 +29,7 @@ public class ClashRoyaleSummary {
 
             for (DeckSummary deckSummary : summaryCreator.generateSummaries()) {
                 deckSummaryWritable = new DeckSummaryWritable(deckSummary);
-                String deckSummaryKey = SummaryCreator.generateKey(deckSummary.sortedCards, deckSummary.dateType, deckSummary.date);
+                String deckSummaryKey = KeyManager.generateKey(deckSummary.sortedCards, deckSummary.dateType, deckSummary.date);
                 context.write(new Text(deckSummaryKey), deckSummaryWritable);
             }
         }
@@ -39,7 +39,7 @@ public class ClashRoyaleSummary {
             extends Mapper<Text, LongWritable, Text, DeckSummaryWritable> {
         @Override
         protected void map(Text key, LongWritable value, Context context) throws IOException, InterruptedException {
-            DeckSummary deckSummary = SummaryCreator.generateSummaryFromKey(key.toString());
+            DeckSummary deckSummary = KeyManager.generateSummaryFromKey(key.toString());
             deckSummary.uniquePlayers = value.get();
             context.write(key, new DeckSummaryWritable(deckSummary));
         }
