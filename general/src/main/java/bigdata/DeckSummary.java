@@ -1,8 +1,9 @@
 package bigdata;
 
+import java.io.Serializable;
 import java.time.Instant;
 
-public class DeckSummary implements Cloneable {
+public class DeckSummary implements Cloneable, Serializable {
     public String sortedCards;
     public Instant date;
     public SummaryDateType dateType;
