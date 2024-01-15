@@ -20,6 +20,6 @@ public class NgramSummary extends DeckSummary implements Serializable, Cloneable
 
     @Override
     public String toString() {
-        return super.toString() +"\n" + test;
+        return super.toString() +"\n";
     }
 }
