@@ -3,8 +3,6 @@ package bigdata;
 import java.io.Serializable;
 
 public class NgramSummary extends DeckSummary implements Serializable, Cloneable  {
-
-    private final String test = "test";
     NgramSummary(){
         super();
     };
