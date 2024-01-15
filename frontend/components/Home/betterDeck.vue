@@ -8,7 +8,7 @@ import { type DeckSummary, EMPTY_DECK_SUMMARY } from '~/models/deckSummary';
 
 </script>
 <template>
-    <div class="flex flex-col items-center p-4">
+    <div class="flex flex-col items-center p-2">
         <div>
             Best deck of the dataset
         </div>
