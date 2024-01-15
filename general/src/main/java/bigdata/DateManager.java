@@ -6,14 +6,17 @@ import java.util.Locale;
 
 public class DateManager {
     public static long getYear(Instant date){
+        if (date.equals(Instant.MIN)) return 0;
         return date.atZone(ZoneId.of("UTC")).getYear();
     }
 
     public static long getMonth(Instant date){
+        if (date.equals(Instant.MIN)) return 0;
         return date.atZone(ZoneId.of("UTC")).getMonth().getValue();
     }
 
     public static long getWeek(Instant date){
+        if (date.equals(Instant.MIN)) return 0;
         return date.atZone(ZoneId.of("UTC")).get(WeekFields.ISO.weekOfWeekBasedYear());
     }
 
@@ -38,7 +41,7 @@ public class DateManager {
             case MONTHLY:
                 return isSameYear && isSameMonth;
             case WEEKLY:
-                return  isSameYear && isSameWeek;
+                return isSameYear && isSameWeek;
             default:
                 return false;
         }

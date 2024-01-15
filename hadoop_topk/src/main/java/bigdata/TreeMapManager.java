@@ -28,10 +28,8 @@ public class TreeMapManager {
         String tree_key = KeyManager.generateKey("", deckSummary.dateType, deckSummary.date);
         TreeMap<Double, DeckSummary> tree = treeList.computeIfAbsent(tree_key, k -> new TreeMap<>(comparator));
         if (checker.checkDeck(deckSummary)) {
-            System.out.println("add "+ deckSummary.sortedCards + " to " + tree_key);
             tree.put(checker.getValue(deckSummary), deckSummary.clone());
             maintainTreeSize(tree);
-            System.out.println("[" + tree_key + "] " + treeList.get(tree_key).size());
         }
     }
 
@@ -39,24 +37,21 @@ public class TreeMapManager {
         return treeList;
     }
 
-    public ArrayList<String> getTopKValues(){
-        ArrayList<String> topKLines = new ArrayList<>(K_VALUE);
-        for (int i =0; i < K_VALUE; i++){
-            ArrayList<DeckSummary> topKGranularity= new ArrayList<>();
-            boolean isLine = false;
-            for (TreeMap<Double, DeckSummary> tree: treeList.values()){
 
-                Map.Entry<Double, DeckSummary> pair = tree.pollFirstEntry();
-                if (pair != null){
-                    topKGranularity.add(pair.getValue());
-                    isLine = true;
-                }else{
-                    topKGranularity.add(new DeckSummary("0000000000000000", Instant.now(), SummaryDateType.NONE));
-                }
+    public ArrayList<DeckSummary> getTopKLine(){
+        ArrayList<DeckSummary> topKLine = new ArrayList<>();
+        boolean isEmpty = true;
+        for (TreeMap<Double, DeckSummary> tree: treeList.values()){
+            Map.Entry<Double, DeckSummary> pair = tree.pollFirstEntry();
+            if (pair != null){
+                topKLine.add(pair.getValue());
+                isEmpty = false;
+            }else{
+                topKLine.add(new DeckSummary("0000000000000000", Instant.now(), SummaryDateType.NONE));
             }
-            if (isLine) topKLines.add(i, topKGranularity.toString());
         }
-        return  topKLines;
+        if (!isEmpty) return topKLine;
+        return null;
     }
 
 }

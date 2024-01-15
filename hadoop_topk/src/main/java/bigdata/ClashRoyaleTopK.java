@@ -13,6 +13,8 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -33,6 +35,7 @@ public class ClashRoyaleTopK {
         protected void cleanup(Mapper<Text, DeckSummaryWritable, NullWritable, DeckSummaryWritable>.Context context)
                 throws IOException, InterruptedException {
             HashMap<String, TreeMap<Double, DeckSummary>> treeList = treeMapManager.getTreeList();
+            context.write(NullWritable.get(), new DeckSummaryWritable(new DeckSummary("0000000000000000", Instant.now(), SummaryDateType.NONE)));
             for (TreeMap<Double, DeckSummary> tree : treeList.values()){
                 for (Map.Entry<Double, DeckSummary> entry : tree.entrySet()) {
                     context.write(NullWritable.get(), new DeckSummaryWritable(entry.getValue()));
@@ -49,12 +52,16 @@ public class ClashRoyaleTopK {
                 throws IOException, InterruptedException {
 
             TreeMapManager treeMapManager = new TreeMapManager();
-
-            for (DeckSummaryWritable value : values) {
-                treeMapManager.addNewDeck(value.deckSummary);
+            int counter = 0;
+            while (values.iterator().hasNext()){
+                treeMapManager.addNewDeck(values.iterator().next().deckSummary.clone());
+                counter++;
             }
-            for (String topKLine: treeMapManager.getTopKValues()){
-                context.write(NullWritable.get(), topKLine);
+            context.write(NullWritable.get(), "Nombre de données dans le reducer: " + counter);
+            ArrayList<DeckSummary> line = treeMapManager.getTopKLine();
+            while(line != null){
+                context.write(NullWritable.get(), line.toString());
+                line = treeMapManager.getTopKLine();
             }
         }
     }
