@@ -41,7 +41,7 @@ public class ClashRoyaleUniquePlayer {
         @Override
         protected void cleanup(Mapper<Text, GameWritable, Text, UniquePlayerWritable>.Context context) throws IOException, InterruptedException {
             for (UniquePlayerWritable uniquePlayer : playerList) {
-                String uniquePlayerKey = SummaryCreator.generateKey(uniquePlayer.cards, uniquePlayer.dateType, uniquePlayer.date);
+                String uniquePlayerKey = KeyManager.generateKey(uniquePlayer.cards, uniquePlayer.dateType, uniquePlayer.date);
                 context.write(new Text(uniquePlayerKey), uniquePlayer);
             }
         }
