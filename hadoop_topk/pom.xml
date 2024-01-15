@@ -42,7 +42,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>bigdata.ClashRoyaleSummary</mainClass>
+                            <mainClass>bigdata.ClashRoyaleTopK</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
