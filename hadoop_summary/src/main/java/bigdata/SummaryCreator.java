@@ -2,8 +2,6 @@ package bigdata;
 
 import java.time.*;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class SummaryCreator {
     PlayerInfoWritable player1;
