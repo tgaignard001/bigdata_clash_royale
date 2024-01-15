@@ -11,6 +11,7 @@
 		<module>general</module>
         <module>hadoop_summary</module>
         <module>hadoop_uniquePlayers</module>
+        <module>hadoop_topk</module>
     </modules>
 	<properties>
 		<maven.compiler.source>8</maven.compiler.source>
