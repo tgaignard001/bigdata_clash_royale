@@ -5,12 +5,16 @@ import java.util.*;
 
 public class TreeMapManager {
     private final int K_VALUE = 500;
-    private final HashMap<String, TreeMap<Double, DeckSummary>> treeList;
+    private final HashMap<String, TreeMap<String, DeckSummary>> treeList;
     private final IChecker checker;
 
-    Comparator<Double> comparator = (Double key1, Double key2) -> {
-        int result = Double.compare(key1, key2);
-        return (result != 0) ? result : 1;
+    Comparator<String> comparator = (String key1, String key2) -> {
+        String[] parts1 = key1.split("_");
+        String[] parts2 = key2.split("_");
+        double value1 = Double.parseDouble(parts1[0]);
+        double value2 = Double.parseDouble(parts2[0]);
+        int result = Double.compare(value1, value2);
+        return (result != 0) ? result : parts1[1].compareTo(parts2[1]);
     };
     public TreeMapManager() {
         this.treeList = new HashMap<>();
@@ -18,22 +22,23 @@ public class TreeMapManager {
         this.checker = new WinRateChecker();
     }
 
-    public void maintainTreeSize(TreeMap<Double, DeckSummary> tree) {
+    public void maintainTreeSize(TreeMap<String, DeckSummary> tree) {
         while (tree.size() > K_VALUE) {
-            tree.remove(tree.firstKey());
+            DeckSummary result = tree.remove(tree.firstKey());
+            System.out.println(tree.firstKey() + result);
         }
     }
 
     public void addNewDeck(DeckSummary deckSummary) {
         String tree_key = KeyManager.generateKey("", deckSummary.dateType, deckSummary.date);
-        TreeMap<Double, DeckSummary> tree = treeList.computeIfAbsent(tree_key, k -> new TreeMap<>(comparator));
+        TreeMap<String, DeckSummary> tree = treeList.computeIfAbsent(tree_key, k -> new TreeMap<>(comparator));
         if (checker.checkDeck(deckSummary)) {
-            tree.put(checker.getValue(deckSummary), deckSummary.clone());
+            tree.put(checker.getValue(deckSummary) + "_" + deckSummary.sortedCards, deckSummary.clone());
             maintainTreeSize(tree);
         }
     }
 
-    public HashMap<String, TreeMap<Double, DeckSummary>> getTreeList() {
+    public HashMap<String, TreeMap<String, DeckSummary>> getTreeList() {
         return treeList;
     }
 
@@ -41,8 +46,8 @@ public class TreeMapManager {
     public ArrayList<DeckSummary> getTopKLine(){
         ArrayList<DeckSummary> topKLine = new ArrayList<>();
         boolean isEmpty = true;
-        for (TreeMap<Double, DeckSummary> tree: treeList.values()){
-            Map.Entry<Double, DeckSummary> pair = tree.pollFirstEntry();
+        for (TreeMap<String, DeckSummary> tree: treeList.values()){
+            Map.Entry<String, DeckSummary> pair = tree.pollFirstEntry();
             if (pair != null){
                 topKLine.add(pair.getValue());
                 isEmpty = false;
@@ -53,5 +58,7 @@ public class TreeMapManager {
         if (!isEmpty) return topKLine;
         return null;
     }
+
+
 
 }
