@@ -6,8 +6,8 @@ public class WinRateChecker implements IChecker{
     }
     @Override
     public boolean checkDeck(DeckSummary deckSummary) {
-        int MIN_UNIQUE_PLAYER = 1;
-        int MIN_USES = 1;
+        int MIN_UNIQUE_PLAYER = 100;
+        int MIN_USES = 100;
         return deckSummary.uses > MIN_USES && deckSummary.uniquePlayers > MIN_UNIQUE_PLAYER;
     }
 

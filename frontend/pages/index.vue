@@ -27,7 +27,7 @@ const items = [{
                     <Decks />
                 </div>
                 <div v-if="item.key === 'ngrams'" class="space-y-3">
-                    <Ngram />
+                    <NGram />
                 </div>
             </template>
         </UTabs>

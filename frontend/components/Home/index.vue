@@ -2,8 +2,8 @@
 </script>
 
 <template>
-    <div class="flex flex-col h-[83vh] w-full gap-20 p-20">
-        <div class="flex flex-row gap-20">
+    <div class="flex flex-col h-[81vh] w-full gap-10 p-20">
+        <div class="flex flex-row gap-10">
             <HomeContainer class="flex-auto">
                 <HomeAbout />
             </HomeContainer>
