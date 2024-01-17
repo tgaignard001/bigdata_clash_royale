@@ -51,7 +51,6 @@ public class KeyManager {
             if (matcher.group(5) != null) year = matcher.group(5);
             if (matcher.group(6) != null) monthOrWeek = matcher.group(6);
         }
-        System.out.println("year: " + Integer.parseInt(year) + ", monthOrWeek: " + Long.parseLong(monthOrWeek));
         switch (dateType){
             case MONTHLY:
                 return DateManager.getDateFromMonth(Integer.parseInt(year), Integer.parseInt(monthOrWeek));

@@ -10,6 +10,7 @@ import org.apache.spark.sql.SparkSession;
 import org.w3c.dom.Text;
 import scala.Tuple2;
 
+import java.io.Serial;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,22 +22,23 @@ public class Spark {
         String inputPath = args[0];
         JavaPairRDD<Text, DeckSummaryWritable> sequenceFileRDD = sparkContext.sequenceFile(inputPath, Text.class, DeckSummaryWritable.class);
 
-        JavaPairRDD<String, NgramSummary> ngramsRDD = sequenceFileRDD.flatMapToPair(
+        JavaPairRDD<Text, DeckSummaryWritable> filteredRDD = sequenceFileRDD.filter(
+                entry -> (entry._2.deckSummary.dateType == SummaryDateType.WEEKLY)
+        );
+
+        JavaPairRDD<String, NgramSummary> ngramsRDD = filteredRDD.flatMapToPair(
                 entry -> {
-                    System.out.println(entry._1);
                     DeckSummary deck = entry._2.deckSummary;
-                    String key = KeyManager.generateKey(deck.sortedCards, deck.dateType, deck.date);
-                    ArrayList<String> ngrams = NGrams.generateKeyCombination(KeyManager.extractCardsFromKey(key));
-                    SummaryDateType dateType = KeyManager.extractDateTypeFromKey(key);
-                    Instant date = KeyManager.extractDateFromKey(key);
-                    List<Tuple2<String, NgramSummary>> newNgramEntries = new ArrayList<>();
-                    for (String ngram : ngrams){
-                        String newKey = KeyManager.generateKey(ngram, dateType, date);
-                        NgramSummary ngramSummary = new NgramSummary();
-                        ngramSummary.updateFromDeckSummary(deck);
-                        newNgramEntries.add(new Tuple2<>(newKey, ngramSummary.clone()));
-                    }
-                    return newNgramEntries.iterator();
+                    SummaryDateType dateType = deck.dateType;
+                    List<String> ngrams = NGrams.generateKeyCombination(deck.sortedCards);
+                    return ngrams.stream()
+                            .map(ngram -> {
+                                String newKey = KeyManager.generateKey(ngram, dateType, deck.date);
+                                NgramSummary ngramSummary = new NgramSummary();
+                                ngramSummary.updateFromDeckSummary(deck);
+                                return new Tuple2<>(newKey, ngramSummary.clone());
+                            })
+                            .iterator();
                 }
         );
 
@@ -54,7 +56,10 @@ public class Spark {
                 }
         );
 
-        aggregatedNgramsRDD
+        JavaPairRDD<String, NgramSummary> sortedNgramsRDD = aggregatedNgramsRDD
+                .sortByKey(true);
+
+        sortedNgramsRDD
                 .map(pair -> new Gson().toJson(pair))
                 .saveAsTextFile(args[1]);
 
