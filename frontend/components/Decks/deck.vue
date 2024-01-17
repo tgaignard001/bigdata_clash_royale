@@ -4,7 +4,12 @@ import type { DeckSummary } from "~/models/deckSummary";
 const props = defineProps<{deckSummary: DeckSummary}>();
 const deck = new Deck(props.deckSummary.sortedCards)
 
-const columns = [{
+const columns = [
+{
+    key: 'rating',
+    label: 'Rating'
+},
+{
     key: 'victories',
     label: 'Victories'
 }, {
@@ -24,6 +29,7 @@ const columns = [{
     label: 'Winrate',
 }]
 const data = [{
+    rating: (props.deckSummary.MeanDiffForce*(props.deckSummary.victories/props.deckSummary.uses)*100).toFixed(0),
     victories: props.deckSummary.victories,
     games: props.deckSummary.uses,
     unique_players: props.deckSummary.uniquePlayers,

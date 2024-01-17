@@ -67,7 +67,7 @@ onMounted(fetchData);
             <URadioGroup
                 class="bg-white p-2 rounded-lg"
                 legend="Sort by:"
-                :options="[{value: 'wr', label: 'Winrate'}, {value: 'mwf', label: 'Mean winning force'}, {value: 'rating', label: 'Rating (wr x mwf)'}]"
+                :options="[{value: 'wr', label: 'Winrate'}, {value: 'mdf', label: 'Mean difference force'}, {value: 'rating', label: 'Rating (wr x mdf)'}]"
                 v-model="sortType"/>
             <UToggle v-model="isDate" size="xl" />
             <USelect v-model="year" :options="years" placeholder="Select a year" :disabled="!isDate" size="xl" />
