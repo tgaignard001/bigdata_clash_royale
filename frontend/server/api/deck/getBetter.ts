@@ -1,5 +1,6 @@
-import { getAllLines } from "~/composables/decks"
+import { getTopK } from "~/composables/decks"
 import { DeckSummary } from "~/models/deckSummary";
+import { DateType }from "~/models/deckSummary";
 
 export default defineEventHandler(() => {
     return {
@@ -8,5 +9,5 @@ export default defineEventHandler(() => {
 })
 
 function getBetterDeck(): DeckSummary {
-    return getAllLines()[0];
+    return getTopK(DateType.NONE, 2023, 0, "wr")[0];
 }

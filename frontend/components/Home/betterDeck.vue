@@ -10,7 +10,7 @@ import { type DeckSummary, EMPTY_DECK_SUMMARY } from '~/models/deckSummary';
 <template>
     <div class="flex flex-col items-center p-2">
         <div>
-            Best deck of the dataset
+            Deck with the best winrate of the dataset
         </div>
         <DecksDeck :deck-summary="better_deck" />
     </div>

@@ -8,13 +8,13 @@
                 <HomeAbout />
             </HomeContainer>
             <HomeContainer>
-                <HomeStats title="Taille du TopK" body="500" icon-path="/tower.png"/>
+                <HomeStats title="TopK size" body="500" icon-path="/tower.png"/>
             </HomeContainer>
             <HomeContainer>
-                <HomeStats title="Nombre de parties minimum" body="100" icon-path="/diamond.png"/>
+                <HomeStats title="Minimum amount of games" body="100" icon-path="/diamond.png"/>
             </HomeContainer>
             <HomeContainer>
-                <HomeStats title="Nombre de joueurs uniques minimum" body="10" icon-path="/diamond.png"/>
+                <HomeStats title="Minimum amount of unique players" body="50" icon-path="/diamond.png"/>
             </HomeContainer>
         </div>
         <div class="flex flex-row flex-1 gap-20">

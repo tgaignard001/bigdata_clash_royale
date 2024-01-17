@@ -1,27 +1,29 @@
 export const MAXDECKLISTSIZE = 20;
 
+export enum DateType {
+    NONE,
+    MONTHLY,
+    WEEKLY,
+}
+
 export type DeckSummary = {
-    cards: string;
-    year: number;
-    month: number;
-    dateType: string;
+    sortedCards: string;
+    date: Date;
+    dateType: DateType;
     victories: number;
     uses: number;
     uniquePlayers: number;
     highestClanLevel: number;
-    sumDiffForce: number;
-    nbDiffForce: number;
+    MeanDiffForce: number;
 }
 
 export const EMPTY_DECK_SUMMARY: DeckSummary = {
-    cards: "0000000000000000",
-    year: 2023,
-    month: 1,
-    dateType: "YEARLY",
+    sortedCards: "0000000000000000",
+    date: new Date(),
+    dateType: DateType.NONE,
     victories: -1,
     uses: -1,
     uniquePlayers: -1,
     highestClanLevel: -1,
-    sumDiffForce: -1,
-    nbDiffForce: -1
+    MeanDiffForce: -1,
 }

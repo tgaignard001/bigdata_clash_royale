@@ -2,7 +2,7 @@
 import type { DeckSummary } from "~/models/deckSummary";
 
 const props = defineProps<{deckSummary: DeckSummary}>();
-const deck = new Deck(props.deckSummary.cards)
+const deck = new Deck(props.deckSummary.sortedCards)
 
 const columns = [{
     key: 'victories',
@@ -28,7 +28,7 @@ const data = [{
     games: props.deckSummary.uses,
     unique_players: props.deckSummary.uniquePlayers,
     highest_clan: props.deckSummary.highestClanLevel,
-    mean_winning_force: (props.deckSummary.sumDiffForce/props.deckSummary.nbDiffForce).toFixed(2),
+    mean_winning_force: (props.deckSummary.MeanDiffForce).toFixed(2),
     winrate: (props.deckSummary.victories/props.deckSummary.uses*100).toFixed(0) + "%"
 }]
 

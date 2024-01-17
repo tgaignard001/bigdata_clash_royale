@@ -29,6 +29,7 @@ public class DeckSummary implements Cloneable, Serializable {
     }
 
     public double getMeanDiffForce() {
+        if (this.nbDiffForce == 0) return 0;
         return this.sumDiffForce / this.nbDiffForce;
     }
 

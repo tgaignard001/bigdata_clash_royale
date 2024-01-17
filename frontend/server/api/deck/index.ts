@@ -1,9 +1,8 @@
-import { getDecks } from "~/composables/decks";
+import { getTopK } from "~/composables/decks";
+import { DateType } from "~/models/deckSummary";
 
 export default defineEventHandler(() => {
-    //console.log("Call to api/deck/index");
-
     return {
-        content: getDecks(),
+        content: getTopK(DateType.NONE, 2023, 0, "wr"),
     }
 })

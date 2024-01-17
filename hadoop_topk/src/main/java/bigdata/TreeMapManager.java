@@ -46,13 +46,14 @@ public class TreeMapManager {
     public ArrayList<DeckSummary> getTopKLine(){
         ArrayList<DeckSummary> topKLine = new ArrayList<>();
         boolean isEmpty = true;
-        for (TreeMap<String, DeckSummary> tree: treeList.values()){
-            Map.Entry<String, DeckSummary> pair = tree.pollFirstEntry();
+        for (Map.Entry<String, TreeMap<String, DeckSummary>> tree: treeList.entrySet()){
+            Map.Entry<String, DeckSummary> pair = tree.getValue().pollLastEntry();
+            String tree_key = tree.getKey();
             if (pair != null){
                 topKLine.add(pair.getValue());
                 isEmpty = false;
             }else{
-                topKLine.add(new DeckSummary("0000000000000000", Instant.now(), SummaryDateType.NONE));
+                topKLine.add(new DeckSummary("0000000000000000", KeyManager.extractDateFromKey(tree_key), KeyManager.extractDateTypeFromKey(tree_key)));
             }
         }
         if (!isEmpty) return topKLine;
