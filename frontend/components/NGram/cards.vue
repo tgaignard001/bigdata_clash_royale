@@ -1,26 +1,26 @@
 <script setup lang="ts">
-import  { cr_cards, type Card } from "../../models/cards";
+import  { cr_cards, type Card } from "~/models/cards";
 
-const card_list = ref([cr_cards[0]]);
+const props = defineProps<{cards: Card[] }>();
 const isOpen = ref([false, false, false, false, false, false, false, false]);
 
 function addCard() {
     let index = Math.round(Math.random()*cr_cards.length)
-    while(card_list.value.includes(cr_cards[index])){
+    while(props.cards.includes(cr_cards[index])){
         index = Math.round(Math.random()*cr_cards.length);
     }
-    card_list.value.push(cr_cards[index]);
+    props.cards.push(cr_cards[index]);
 }
 
 function removeCard(index: number){
     return () => {
-        card_list.value.splice(index, 1);
+        props.cards.splice(index, 1);
     }
 }
 
 function changeCard(index: number){
     return (card: Card) => {
-        card_list.value[index] = card;
+        props.cards[index] = card;
         isOpen.value[index] = false;
     }
 }
@@ -28,7 +28,7 @@ function changeCard(index: number){
 </script>
 <template>
     <div class="flex flex-row items-center gap-10 w-full">
-        <div v-for="card, index in card_list">
+        <div v-for="card, index in props.cards">
             <div class="relative">
                 <UButton v-if="index > 0" class="absolute right-0" :onclick="removeCard(index)" icon="i-heroicons-x-mark" size="sm" square variant="ghost" color="red" />
                 <UButton color="white" @click="isOpen[index] = true">
@@ -40,6 +40,6 @@ function changeCard(index: number){
             </UModal>
         </div>
 
-        <UButton v-if="card_list.length < 8" :onclick="addCard" icon="i-heroicons-plus" size="sm" square variant="solid" color="yellow" />
+        <UButton v-if="props.cards.length < 8" :onclick="addCard" icon="i-heroicons-plus" size="sm" square variant="solid" color="yellow" />
     </div>
 </template>
