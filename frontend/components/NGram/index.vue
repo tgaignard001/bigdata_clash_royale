@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import  { cr_cards, type Card } from "~/models/cards";
-const card_list = ref([cr_cards[0]]);
+const card_list = ref([cr_cards[0], cr_cards[1]]);
 
 function getNGram(list: Card[]){
     let deck = new Deck();

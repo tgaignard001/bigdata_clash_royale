@@ -30,7 +30,7 @@ function changeCard(index: number){
     <div class="flex flex-row items-center gap-10 w-full">
         <div v-for="card, index in props.cards">
             <div class="relative">
-                <UButton v-if="index > 0" class="absolute right-0" :onclick="removeCard(index)" icon="i-heroicons-x-mark" size="sm" square variant="ghost" color="red" />
+                <UButton v-if="index > 1" class="absolute right-0" :onclick="removeCard(index)" icon="i-heroicons-x-mark" size="sm" square variant="ghost" color="red" />
                 <UButton color="white" @click="isOpen[index] = true">
                     <NGramCard :card="card" :remove="removeCard(index)"/>
                 </UButton>

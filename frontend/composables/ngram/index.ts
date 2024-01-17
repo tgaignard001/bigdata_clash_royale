@@ -2,7 +2,7 @@ import type { KeyData, NGramSummary } from "~/models/nGramSummary";
 import { readFileSync } from "fs";
 import { DateType } from "~/models/deckSummary";
 
-const default_path = "utils/spark-example.txt";
+const default_path = "utils/small_spark_ngrams_2_3.txt";
 
 export function getAllLines(filePath = default_path): NGramSummary[]{
     const allLines = readFileSync(filePath, 'utf-8').split("\n").map(extractNGramSummary) as NGramSummary[];
