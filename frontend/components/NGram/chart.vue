@@ -13,13 +13,24 @@ const { data } = await useFetch<ApiBody>(`/api/ngram/${props.ngram}`)
 
 const summaries: NGramSummary[] = (data.value) ? data.value.content : [];
 
-const chartData = {
-  labels: extractLabels(summaries),
+const chartWinrateData = {
+  labels: extractDate(summaries),
   datasets: [
     {
-      label: props.ngram,
+      label: "Winrate (%)",
       backgroundColor: '#f87979',
-      data: extractData(summaries),
+      data: extractWinrate(summaries),
+    },
+  ],
+};
+
+const chartUsesData = {
+  labels: extractDate(summaries),
+  datasets: [
+    {
+      label: "Uses",
+      backgroundColor: '#f87979',
+      data: extractUses(summaries),
     },
   ],
 };
@@ -29,7 +40,7 @@ const chartOptions = {
   maintainAspectRatio: false,
 };
 
-function extractLabels(list: NGramSummary[]){
+function extractDate(list: NGramSummary[]){
     let tmp: string[] = [];
     for (let i in list){
         const year = list[i]._1.split('-')[1].slice(1);
@@ -39,7 +50,7 @@ function extractLabels(list: NGramSummary[]){
     return tmp;
 }
 
-function extractData(list: NGramSummary[]){
+function extractWinrate(list: NGramSummary[]){
     let tmp: number[] = [];
     for (let i in list){
         tmp.push(list[i]._2.victories/list[i]._2.uses*100);
@@ -47,11 +58,22 @@ function extractData(list: NGramSummary[]){
     return tmp;
 }
 
+function extractUses(list: NGramSummary[]){
+    let tmp: number[] = [];
+    for (let i in list){
+        tmp.push(list[i]._2.uses);
+    }
+    return tmp;
+}
+
 </script>
 <template>
-    <div class="flex flex-col items-center w-full h-full">
-        <Line
-        class="rounded-xl bg-white"
-        :options="chartOptions" :data="chartData" />
+    <div class="flex flex-row w-full h-full gap-4">
+        <div class="w-1/2 h-full">
+            <Line class="rounded-xl bg-white" :options="chartOptions" :data="chartWinrateData" />
+        </div>
+        <div class="w-1/2 h-full">
+            <Line class="rounded-xl bg-white" :options="chartOptions" :data="chartUsesData" />
+        </div>
     </div>
 </template>
