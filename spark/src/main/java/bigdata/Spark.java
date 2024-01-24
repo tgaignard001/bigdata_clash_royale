@@ -44,14 +44,14 @@ public class Spark {
                     }
             );
 
-        JavaPairRDD<String, NgramSummary> aggregatedNgramsRDD =
+        JavaPairRDD<String, NgramSummary> reducedNgramsRDD =
                 ngramsRDD.reduceByKey((summary1, summary2) -> {
                     NgramSummary mergedSummary = summary1.clone();
                     mergedSummary.updateSummary(summary2.clone());
-                    return summary1;
+                    return mergedSummary;
                 });
 
-        JavaPairRDD<String, NgramSummary> sortedNgramsRDD = aggregatedNgramsRDD
+        JavaPairRDD<String, NgramSummary> sortedNgramsRDD = reducedNgramsRDD
                 .sortByKey(true);
 
         sortedNgramsRDD

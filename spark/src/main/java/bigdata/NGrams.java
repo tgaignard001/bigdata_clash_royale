@@ -5,7 +5,7 @@ import java.util.List;
 
 class NGrams {
 
-    private static List<String> combinationUtil(ArrayList<String> arr, ArrayList<String> data, int start,
+    private static List<String> combinationRecursive(ArrayList<String> arr, ArrayList<String> data, int start,
                                         int end, int index, int r) {
         List<String> result = new ArrayList<>();
 
@@ -21,7 +21,7 @@ class NGrams {
 
         for (int i = start; i <= end && end - i + 1 >= r - index; i++) {
             data.set(index, arr.get(i));
-            result.addAll(combinationUtil(arr, data, i + 1, end, index + 1, r));
+            result.addAll(combinationRecursive(arr, data, i + 1, end, index + 1, r));
         }
         return result;
     }
@@ -32,7 +32,7 @@ class NGrams {
             data.add("");
         }
 
-        return combinationUtil(arr, data, 0, arr.size() - 1, 0, r);
+        return combinationRecursive(arr, data, 0, arr.size() - 1, 0, r);
     }
 
     private static ArrayList<String> convertStringToArrayList(String str) {
@@ -48,7 +48,7 @@ class NGrams {
     {
         ArrayList<String> arr = convertStringToArrayList(combination);
         ArrayList<String> combinations = new ArrayList<>();
-        for (int i = 2; i <= 3; ++i){
+        for (int i = 2; i <= arr.size(); ++i){
             combinations.addAll(generateCombinations(arr, i));
         }
         return combinations;
