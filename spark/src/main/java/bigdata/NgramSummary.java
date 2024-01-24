@@ -1,10 +1,11 @@
 package bigdata;
 
 import java.io.Serializable;
+import java.time.Instant;
 
 public class NgramSummary extends DeckSummary implements Serializable, Cloneable  {
-    NgramSummary(){
-        super();
+    NgramSummary(String cards, Instant date, SummaryDateType dateType){
+        super(cards, date, dateType);
     };
     public void updateSummary(NgramSummary ngramSummary){
         super.updateDeckSummary(ngramSummary);
