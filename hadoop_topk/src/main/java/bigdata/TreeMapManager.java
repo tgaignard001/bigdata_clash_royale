@@ -19,7 +19,7 @@ public class TreeMapManager {
     public TreeMapManager() {
         this.treeList = new HashMap<>();
         this.treeList.put(KeyManager.generateKey("", SummaryDateType.NONE, Instant.now()), new TreeMap<>(comparator));
-        this.checker = new WinRateChecker();
+        this.checker = new UsesChecker();
     }
 
     public void maintainTreeSize(TreeMap<String, DeckSummary> tree) {
