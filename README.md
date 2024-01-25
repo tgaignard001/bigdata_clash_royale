@@ -16,6 +16,9 @@ projet et faire la commande:
 ```
 Cela va générer tous les package de tous les modules.
 
+Par exemple, pour executer le cleaning, il est nécessaire de se rendre dans le dossier `hadoop/target`. Le nom de l'exécutable est `hadoop-0-0.1-jar-with-dependencies.jar`.
+En ce qui concerne spark, le chemin de l'exécutable est le suivant : `spark/target/spark-0.0.1-jar-with-dependencies.jar`.
+
 ## Description des agrégats
 ```json
 {
