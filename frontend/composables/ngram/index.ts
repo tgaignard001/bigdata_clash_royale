@@ -2,7 +2,7 @@ import type { KeyData, NGramSummary } from "~/models/nGramSummary";
 import { readFileSync } from "fs";
 import { DateType } from "~/models/deckSummary";
 
-const default_path = "utils/spark_ngrams_2_3.txt";
+const default_path = "utils/spark_ngrams_2_3_big.txt";
 
 export function getAllLines(filePath = default_path): NGramSummary[]{
     const allLines = readFileSync(filePath, 'utf-8').split("\n").map(extractNGramSummary) as NGramSummary[];
@@ -10,9 +10,14 @@ export function getAllLines(filePath = default_path): NGramSummary[]{
     return allLines;
 }
 
-function extractNGramSummary(line: string): NGramSummary {
-    const jsonLine = JSON.parse(line) as NGramSummary;
-    return jsonLine;
+function extractNGramSummary(line: string, index: number) {
+    try{
+        let maxLog = 0;
+        const jsonLine = JSON.parse(line) as NGramSummary;
+        return jsonLine;
+    }catch (e){
+        console.log("error of deserialisation on line nb ", index, ": ", line, "...");
+    }
 }
 
 export function getNGramSummaries(ngram: string){

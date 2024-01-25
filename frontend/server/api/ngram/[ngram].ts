@@ -1,4 +1,4 @@
-import { getAllLines, getNGramSummaries } from "~/composables/ngram";
+import { getNGramSummaries } from "~/composables/ngram";
 
 export default defineEventHandler((event) => {
     const params = event.context.params?.ngram;
